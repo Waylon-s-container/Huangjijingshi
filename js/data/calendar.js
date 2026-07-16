@@ -11,3 +11,29 @@ export function yearsSinceEpoch(year) {
   }
   return (-EPOCH_YEAR) - (-year);       // 67017 - |year|
 }
+
+// 十二会名（地支），索引 0=子 … 6=午 … 11=亥
+const HUI_NAMES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+// 元会运世定位。所有索引均为 0-based；显示时 +1 转 1-based。
+// 返回字段：yuanIndex/huiIndex/huiName/yunInHui(会内)/yunAbs(全元)/shiInYun/yearInShi
+export function locate(year) {
+  const total = yearsSinceEpoch(year);
+  const yuanIndex = Math.floor(total / 129600);
+  const rem1 = total % 129600;
+  const huiIndex = Math.floor(rem1 / 10800);
+  const rem2 = rem1 % 10800;
+  const yunInHui = Math.floor(rem2 / 360);
+  const rem3 = rem2 % 360;
+  const shiInYun = Math.floor(rem3 / 30);
+  const yearInShi = rem3 % 30;
+  return {
+    yuanIndex,
+    huiIndex,
+    huiName: HUI_NAMES[huiIndex],
+    yunInHui,
+    yunAbs: huiIndex * 30 + yunInHui, // 全元第几运(0-based)
+    shiInYun,
+    yearInShi,
+  };
+}
