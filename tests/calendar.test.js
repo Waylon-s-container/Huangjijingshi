@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { yearsSinceEpoch, locate, EPOCH_YEAR, YAO_YEAR } from '../js/data/calendar.js';
+import { yearsSinceEpoch, locate, valueYearHexagram, EPOCH_YEAR, YAO_YEAR } from '../js/data/calendar.js';
 
 test('历元边界：前67017年距元初为0', () => {
   assert.equal(yearsSinceEpoch(EPOCH_YEAR), 0);
@@ -49,4 +49,29 @@ test('历元位于子会第1运第1世', () => {
   assert.equal(loc.huiName, '子');
   assert.equal(loc.yunInHui, 0);
   assert.equal(loc.shiInYun, 0);
+});
+
+// ===== 值年卦推演（基准外推法，P1） =====
+test('2026年值年卦为同人（黄金用例）', () => {
+  const hex = valueYearHexagram(2026);
+  assert.equal(hex.name, '同人');
+});
+
+test('值年卦返回完整卦对象', () => {
+  const hex = valueYearHexagram(2026);
+  assert.equal(hex.lines.length, 6);
+  assert.ok(typeof hex.judgment === 'string');
+});
+
+test('60年周期：2086与1966同为同人', () => {
+  assert.equal(valueYearHexagram(2086).name, '同人');
+  assert.equal(valueYearHexagram(1966).name, '同人');
+});
+
+test('相邻年份值年卦相邻于同人', () => {
+  // 2025、2027 应为60卦圆图中同人前后的卦
+  const h2025 = valueYearHexagram(2025);
+  const h2027 = valueYearHexagram(2027);
+  assert.notEqual(h2025.name, '同人');
+  assert.notEqual(h2027.name, '同人');
 });

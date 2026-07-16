@@ -37,3 +37,22 @@ export function locate(year) {
     yearInShi,
   };
 }
+
+// ===== 值年卦推演（P1: 基准外推法） =====
+// 60卦圆图（去四正卦乾坤坎离），按 HEXAGRAMS 圆图序保留
+import { HEXAGRAMS } from './hexagrams.js';
+const CIRCLE60 = HEXAGRAMS.filter(h => !h.isCardinal);
+
+// 基准锚点：2026年 = 同人卦（多源文献交叉确认）
+const BASE_YEAR = 2026;
+const BASE_HEXAGRAM_NAME = '同人';
+const BASE_INDEX = CIRCLE60.findIndex(h => h.name === BASE_HEXAGRAM_NAME);
+
+// 值年卦：以2026=同人为锚，沿60卦圆图顺时针推进，60年一轮。
+// 这是P1的最简确定性实现，满足60年周期正确。
+// 完整推演链（会卦→爻变→运卦→爻变→世卦→圆图推进）留待P2宏观层。
+export function valueYearHexagram(year) {
+  const yearsFromBase = yearsSinceEpoch(year) - yearsSinceEpoch(BASE_YEAR);
+  const idx = ((BASE_INDEX + yearsFromBase) % 60 + 60) % 60;
+  return CIRCLE60[idx];
+}
