@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>水墨写意 Spike 验证</title>
+<style>
+  body { margin: 0; background: #f4ecd8; font-family: 'Noto Serif SC', serif; color: #2a2418; }
+  h2 { text-align: center; padding: 20px; font-weight: 700; letter-spacing: 4px; }
+  .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; padding: 20px 40px 60px; }
+  .item { text-align: center; }
+  .item canvas { background: rgba(235,224,200,0.5); border: 1px solid #8a7a5a; }
+  .item .name { font-size: 20px; margin-top: 10px; letter-spacing: 3px; }
+  .item .desc { font-size: 11px; color: #6a5a3a; margin-top: 4px; }
+  .criteria { max-width: 600px; margin: 0 auto; padding: 0 40px 20px; font-size: 13px; line-height: 1.9; color: #6a5a3a; }
+</style>
+</head>
+<body>
+<h2>水墨写意笔触 Spike 验证</h2>
+<div class="criteria">
+  <strong>评估标准（满足即可继续原方案）：</strong><br>
+  ① 墨色有可见浓淡变化（非纯黑均匀）<br>
+  ② 笔画端点有枯笔/飞白感（非干净几何裁切）<br>
+  ③ 整体观感接近"写出来"而非"画出来"<br>
+  ④ 阴阳爻（断/连）清晰可辨
+</div>
+<div class="grid" id="grid"></div>
+
+<script type="module">
+import { drawHexagram } from '../js/render/inkBrush.js';
+
+const cases = [
+  { name: '坤', lines: '000000', desc: '全阴（三断爻）' },
+  { name: '乾', lines: '111111', desc: '全阳（三连爻）' },
+  { name: '既济', lines: '101010', desc: '阴阳交杂' },
+  { name: '同人', lines: '101110', desc: '2026值年卦' },
+  { name: '坎', lines: '010010', desc: '四正卦·重阴' },
+  { name: '大过', lines: '011110', desc: '2026会卦' },
+];
+
+const grid = document.getElementById('grid');
+for (const c of cases) {
+  const wrap = document.createElement('div');
+  wrap.className = 'item';
+  const cv = document.createElement('canvas');
+  cv.width = 160; cv.height = 200;
+  wrap.appendChild(cv);
+  const nameEl = document.createElement('div');
+  nameEl.className = 'name';
+  nameEl.textContent = c.name;
+  wrap.appendChild(nameEl);
+  const descEl = document.createElement('div');
+  descEl.className = 'desc';
+  descEl.textContent = c.desc;
+  wrap.appendChild(descEl);
+  grid.appendChild(wrap);
+
+  const ctx = cv.getContext('2d');
+  drawHexagram(ctx, 80, 100, 70, c.lines);
+}
+</script>
+</body>
+</html>
