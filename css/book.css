@@ -1,0 +1,131 @@
+/* 教材布局与正文样式（延续古籍水墨风，依赖 style.css 的 CSS 变量） */
+
+/* 封面入口按钮 */
+.enter-book {
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: 3px;
+  border: 1px solid var(--line);
+  padding: 6px 16px;
+}
+.enter-book:hover { color: var(--zhu); border-color: var(--zhu); }
+
+/* 教材整体布局 */
+.book-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: calc(100vh - 60px);
+}
+.book-toc {
+  background: rgba(235,224,200,0.4);
+  border-right: 1px solid var(--line);
+  padding: 24px 16px;
+}
+.toc-title {
+  font-size: 13px;
+  color: var(--ink-light);
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(138,122,90,0.3);
+}
+.toc-item {
+  display: block;
+  font-size: 13px;
+  color: var(--ink);
+  padding: 10px 8px;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  line-height: 1.6;
+}
+.toc-item:hover { background: rgba(160,32,32,0.05); }
+.toc-item.active { color: var(--zhu); border-left-color: var(--zhu); font-weight: 700; }
+.toc-item.draft { color: var(--ink-light); opacity: 0.5; pointer-events: none; }
+
+.book-main { display: flex; flex-direction: column; }
+.book-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-light);
+}
+.back-cover { color: var(--ink); text-decoration: none; letter-spacing: 2px; }
+.chapter-progress { letter-spacing: 2px; }
+
+.book-content {
+  padding: 40px 48px 60px;
+  max-width: 720px;
+  line-height: 1.9;
+}
+.chapter-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.book-section { margin-bottom: 48px; }
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  color: var(--ink);
+}
+
+/* 五段式各段 */
+.seg { margin-bottom: 18px; font-size: 15px; }
+.seg.intro { color: var(--ink); }
+.seg-label {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--zhu);
+  letter-spacing: 3px;
+  margin-right: 8px;
+  font-weight: 700;
+}
+.seg.source {
+  background: rgba(235,224,200,0.5);
+  border-left: 3px solid var(--zhu);
+  padding: 14px 18px;
+}
+.source-quote {
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--ink);
+  margin: 0 0 8px 0;
+}
+.source-cite { font-size: 12px; color: var(--ink-light); }
+.seg.commentaries { padding-left: 12px; }
+.comm-item {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.comm-author { color: var(--zhu); font-weight: 700; }
+.comm-work { color: var(--ink-light); font-size: 12px; }
+.seg.diagram { text-align: center; margin: 24px 0; }
+.diagram-svg { width: 100%; max-width: 360px; height: auto; }
+.diagram-caption { font-size: 12px; color: var(--ink-light); margin-top: 8px; letter-spacing: 2px; }
+.seg.summary {
+  background: rgba(138,122,90,0.08);
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px 48px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.chapter-nav a { color: var(--ink); text-decoration: none; }
+.chapter-nav a:hover { color: var(--zhu); }
+.nav-next.disabled { color: var(--ink-light); opacity: 0.5; }
