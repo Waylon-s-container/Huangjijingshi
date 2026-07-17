@@ -5,31 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>皇極經世</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/book.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap">
 </head>
 <body>
-  <header class="top-bar">
-    <h1>皇極經世</h1>
-    <div class="scale-switcher" title="P1 阶段仅值年卦层">尺度：值年卦</div>
-    <div class="seal">皇極</div>
-  </header>
-
-  <main class="stage">
-    <div class="map-wrap">
-      <canvas id="hex-map" width="700" height="700"></canvas>
-      <svg id="anchor-layer" width="700" height="700" class="anchor-layer"></svg>
+  <div id="app">
+    <!-- 封面：时钟日历 -->
+    <div id="cover-view">
+      <header class="top-bar">
+        <h1>皇極經世</h1>
+        <a class="enter-book" href="#/book/intro">入讀教材 ⟶</a>
+        <div class="seal">皇極</div>
+      </header>
+      <main class="stage">
+        <section class="col-map">
+          <div class="col-title">六十四卦圓圖</div>
+          <div class="map-wrap">
+            <canvas id="hex-map" width="600" height="600"></canvas>
+            <svg id="anchor-layer" width="600" height="600" class="anchor-layer"></svg>
+          </div>
+        </section>
+        <section class="col-text">
+          <div class="col-title">卦辭</div>
+          <div id="text-panel" class="text-empty">點擊圓圖中的卦象<br>以閱其辭</div>
+        </section>
+        <section class="col-info">
+          <div class="col-title">元會運世</div>
+          <div id="detail-panel"></div>
+          <table class="info-table" id="info-table"></table>
+        </section>
+      </main>
+      <footer class="bottom-bar">
+        <div class="time-scrubber" id="time-scrubber"></div>
+        <div class="era-locator" id="era-locator"></div>
+      </footer>
+      <div class="footer-note" id="footer-note"></div>
     </div>
-    <div class="detail-panel" id="detail-panel"></div>
-  </main>
-
-  <footer class="bottom-bar">
-    <div class="time-scrubber" id="time-scrubber"></div>
-    <div class="era-locator" id="era-locator"></div>
-  </footer>
-
-  <div class="footer-note" id="footer-note"></div>
-
+    <!-- 教材视图（由路由挂载） -->
+    <div id="book-view" hidden></div>
+  </div>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
