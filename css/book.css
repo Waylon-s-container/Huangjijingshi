@@ -129,3 +129,76 @@
 .chapter-nav a { color: var(--ink); text-decoration: none; }
 .chapter-nav a:hover { color: var(--zhu); }
 .nav-next.disabled { color: var(--ink-light); opacity: 0.5; }
+
+/* 交互式时间定位器 */
+.locator-box {
+  background: rgba(235,224,200,0.5);
+  border: 1px solid var(--line);
+  padding: 20px;
+  margin: 16px 0;
+}
+.locator-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.locator-label { font-size: 13px; color: var(--ink-light); letter-spacing: 3px; }
+.locator-input {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px;
+  padding: 6px 12px;
+  width: 120px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+}
+.locator-btn {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13px;
+  padding: 6px 18px;
+  border: 1px solid var(--zhu);
+  background: transparent;
+  color: var(--zhu);
+  cursor: pointer;
+  letter-spacing: 2px;
+}
+.locator-btn:hover { background: var(--zhu); color: var(--paper); }
+.loc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.loc-cell {
+  text-align: center;
+  padding: 10px 4px;
+  border: 1px solid rgba(138,122,90,0.3);
+  background: rgba(244,236,216,0.5);
+}
+.loc-cell.highlight {
+  border-color: var(--zhu);
+  background: rgba(160,32,32,0.06);
+}
+.loc-cell-label {
+  font-size: 11px;
+  color: var(--ink-light);
+  letter-spacing: 3px;
+  margin-bottom: 4px;
+}
+.loc-cell-val { font-size: 14px; color: var(--ink); font-weight: 700; }
+.loc-cell-val small { font-size: 10px; color: var(--ink-light); font-weight: 400; }
+.loc-hex-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: rgba(235,224,200,0.4);
+  border-left: 3px solid var(--zhu);
+}
+.loc-hex-svg { flex-shrink: 0; }
+.loc-hex-name { font-size: 22px; font-weight: 700; letter-spacing: 4px; color: var(--ink); }
+.loc-hex-judge { font-size: 12px; color: var(--ink-light); line-height: 1.6; margin-top: 4px; }
+.loc-meta { font-size: 11px; color: var(--ink-light); margin-top: 10px; letter-spacing: 1px; }
+.loc-err { color: var(--zhu); font-size: 13px; }

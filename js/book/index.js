@@ -5,9 +5,16 @@ import ch2 from './ch2.js';
 import { renderBook } from './render.js';
 import { renderEraNesting } from './diagrams/eraNesting.js';
 import { renderFangyuanTu } from './diagrams/fangyuanTu.js';
+import { renderXiaoXi } from './diagrams/xiaoXi.js';
+import { renderTimeLocator } from './diagrams/timeLocator.js';
 
 const CHAPTER_DATA = { intro, ch1, ch2 };
-const DIAGRAMS = { eraNesting: renderEraNesting, fangyuanTu: renderFangyuanTu };
+const DIAGRAMS = {
+  eraNesting: renderEraNesting,
+  fangyuanTu: renderFangyuanTu,
+  xiaoXi: renderXiaoXi,
+  timeLocator: renderTimeLocator,
+};
 
 // 渲染教材某章节到 container
 export function renderChapterView(container, chapterId) {
