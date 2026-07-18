@@ -1,13 +1,10 @@
-// 元会运世嵌套圈图解：
-// 外环十二会扇区 + 年份；午会内运/世刻度；朱砂指针；定位信息在图下方（避免与南位重叠）。
+// 元会运世嵌套圈图解。
+// 方位遵循传统地支：子=北(下)、午=南(上)、卯=东(右)、酉=西(左)。
+//   即子会起始角为 +π/2（正下方），顺时针推进：子→丑→…→午(正上)→…→亥。
+// 当前运扇区只画在运环内（不侵入世环），避免运/世视觉混淆。
 import { locate } from '../../data/calendar.js';
 
 const HUI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-const HUI_TINT = [
-  '#a02020', '#8a4a32', '#a06030', '#8a6a3a',
-  '#6a5a3a', '#5a4a32', '#a02020', '#6a5a3a',
-  '#5a4a42', '#4a4a52', '#4a3a4a', '#5a3a42',
-];
 const ZHU = '#a02020';
 
 function toYear(n) { return n < 67017 ? -(67017 - n) : (n - 67017 + 1); }
@@ -15,11 +12,9 @@ function fmtK(y) {
   if (y <= 0) return '前' + Math.round(-y / 1000) + 'k';
   return Math.round(y / 1000) + 'k';
 }
-
 function polar(cx, cy, r, a) {
   return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
 }
-
 function sectorPath(cx, cy, rIn, rOut, a0, a1) {
   const [x0, y0] = polar(cx, cy, rOut, a0);
   const [x1, y1] = polar(cx, cy, rOut, a1);
@@ -32,6 +27,12 @@ function sectorPath(cx, cy, rIn, rOut, a0, a1) {
     A ${rIn} ${rIn} 0 ${large} 0 ${x3.toFixed(1)} ${y3.toFixed(1)} Z`;
 }
 
+// 第 i 会的起始角（子=北/下方=+π/2，顺时针）
+function huiStart(i) {
+  // 顺时针推进 = 角度递增（SVG y 向下，cos/sin 标准定义下 +π/2 是正下方）
+  return Math.PI / 2 + (i / 12) * Math.PI * 2;
+}
+
 export function renderEraNesting(container) {
   const huiRanges = HUI.map((name, i) => {
     const s = i * 10800, e = (i + 1) * 10800 - 1;
@@ -40,27 +41,26 @@ export function renderEraNesting(container) {
   const cur = locate(2026);
 
   const cx = 220, cy = 220;
-  // 环半径：外标签在 R_LABEL，不再把定位卡塞进 SVG
-  const R_LABEL = 198;   // 年份/会名外标
-  const R_OUT = 172;     // 最外装饰环
-  const R_HUI = 158;     // 会环外
-  const R_HUI_IN = 122;  // 会环内
+  const R_LABEL = 198;
+  const R_OUT = 172;
+  const R_HUI = 158;
+  const R_HUI_IN = 122;
   const R_YUN = 118;
-  const R_YUN_IN = 82;
+  const R_YUN_IN = 86;
   const R_SHI = 80;
   const R_CORE = 40;
 
-  // 12会扇区 + 标签（会名在扇区中部，年份在环外）
+  // 12会扇区 + 标签
   let huiSectors = '';
   let huiLabels = '';
   huiRanges.forEach((h, i) => {
-    const a0 = (i / 12) * Math.PI * 2 - Math.PI / 2;
-    const a1 = ((i + 1) / 12) * Math.PI * 2 - Math.PI / 2;
+    const a0 = huiStart(i);
+    const a1 = huiStart(i + 1);
     const isCur = i === cur.huiIndex;
     const mid = (a0 + a1) / 2;
     const opacity = isCur ? 0.18 : 0.06;
     huiSectors += `<path d="${sectorPath(cx, cy, R_HUI_IN, R_HUI, a0, a1)}"
-      fill="${HUI_TINT[i]}" opacity="${opacity}"
+      fill="${isCur ? ZHU : '#8a6a3a'}" opacity="${opacity}"
       stroke="${isCur ? ZHU : '#8a7a5a'}" stroke-width="${isCur ? 1.4 : 0.4}"/>`;
 
     const [lx1, ly1] = polar(cx, cy, R_HUI_IN, a0);
@@ -70,7 +70,7 @@ export function renderEraNesting(container) {
 
     // 会名：扇区中心
     const [tx, ty] = polar(cx, cy, (R_HUI + R_HUI_IN) / 2, mid);
-    // 年份：环外，与会名径向错开
+    // 年份：环外
     const [ex, ey] = polar(cx, cy, R_LABEL, mid);
     huiLabels += `
       <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" font-size="${isCur ? 15 : 13}"
@@ -81,9 +81,9 @@ export function renderEraNesting(container) {
         opacity="0.85">${fmtK(h.ya)}</text>`;
   });
 
-  // 午会内 30 运刻度
-  const huiA0 = (cur.huiIndex / 12) * Math.PI * 2 - Math.PI / 2;
-  const huiA1 = ((cur.huiIndex + 1) / 12) * Math.PI * 2 - Math.PI / 2;
+  // 午会内 30 运刻度（只画在运环 R_YUN_IN~R_YUN 内）
+  const huiA0 = huiStart(cur.huiIndex);
+  const huiA1 = huiStart(cur.huiIndex + 1);
   let yunTicks = '';
   for (let y = 0; y <= 30; y++) {
     const a = huiA0 + (y / 30) * (huiA1 - huiA0);
@@ -94,25 +94,31 @@ export function renderEraNesting(container) {
     yunTicks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"
       stroke="${isCur ? ZHU : '#aa9a72'}" stroke-width="${isCur ? 2 : (isMajor ? 0.9 : 0.4)}"/>`;
   }
+  // 当前运扇区：只画在运环内（R_YUN_IN ~ R_YUN），不侵入世环
   const yunA = huiA0 + (cur.yunInHui / 30) * (huiA1 - huiA0);
   const yunB = huiA0 + ((cur.yunInHui + 1) / 30) * (huiA1 - huiA0);
-  const curSector = `<path d="${sectorPath(cx, cy, R_CORE + 4, R_YUN, yunA, yunB)}"
-    fill="${ZHU}" opacity="0.16" stroke="${ZHU}" stroke-width="0.8"/>`;
+  const curSector = `<path d="${sectorPath(cx, cy, R_YUN_IN, R_YUN, yunA, yunB)}"
+    fill="${ZHU}" opacity="0.22" stroke="${ZHU}" stroke-width="1"/>`;
 
-  // 当前运内 12 世
+  // 当前运内 12 世刻度（只画在世环 R_CORE ~ R_SHI 内）
   let shiTicks = '';
   for (let s = 0; s <= 12; s++) {
     const a = yunA + (s / 12) * (yunB - yunA);
     const isCur = s === cur.shiInYun;
-    const [x1, y1] = polar(cx, cy, R_CORE + 4, a);
-    const [x2, y2] = polar(cx, cy, R_SHI - 4, a);
+    const [x1, y1] = polar(cx, cy, R_CORE + 2, a);
+    const [x2, y2] = polar(cx, cy, R_SHI, a);
     shiTicks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"
-      stroke="${isCur ? ZHU : '#c0b090'}" stroke-width="${isCur ? 1.5 : 0.4}"/>`;
+      stroke="${isCur ? ZHU : '#c0b090'}" stroke-width="${isCur ? 1.6 : 0.4}"/>`;
   }
+  // 当前世小扇区（世环内）
+  const shiA = yunA + (cur.shiInYun / 12) * (yunB - yunA);
+  const shiB = yunA + ((cur.shiInYun + 1) / 12) * (yunB - yunA);
+  const curShiSector = `<path d="${sectorPath(cx, cy, R_CORE + 2, R_SHI, shiA, shiB)}"
+    fill="${ZHU}" opacity="0.28"/>`;
 
-  // 指针
+  // 指针指向当前运中线
   const midYun = (yunA + yunB) / 2;
-  const [px, py] = polar(cx, cy, R_YUN - 6, midYun);
+  const [px, py] = polar(cx, cy, R_YUN - 4, midYun);
   const pointer = `
     <line x1="${cx}" y1="${cy}" x2="${px.toFixed(1)}" y2="${py.toFixed(1)}"
       stroke="${ZHU}" stroke-width="1.1" stroke-dasharray="3,2" opacity="0.5"/>
@@ -120,17 +126,15 @@ export function renderEraNesting(container) {
       <animate attributeName="r" values="2.8;4.2;2.8" dur="2.4s" repeatCount="indefinite"/>
     </circle>`;
 
-  // 环层标注：放在右侧水平位置，径向错开，不压扇区字
-  // 会环右缘外侧、运环右缘、世环右缘 —— 略偏上避免与卯会字重叠
+  // 环层标注（放在四正方位的空隙，避免压字）：北、南、东、西四正
   const ringLabels = `
-    <text x="${cx + (R_HUI + R_HUI_IN) / 2}" y="${cy + 14}" font-size="8" fill="#6a5a3a"
-      text-anchor="middle" opacity="0.55">會</text>
-    <text x="${cx + (R_YUN + R_YUN_IN) / 2}" y="${cy + 14}" font-size="8" fill="#6a5a3a"
-      text-anchor="middle" opacity="0.55">運</text>
-    <text x="${cx + (R_SHI + R_CORE) / 2}" y="${cy + 14}" font-size="8" fill="#6a5a3a"
-      text-anchor="middle" opacity="0.55">世</text>`;
+    <text x="${cx}" y="${cy + (R_HUI + R_HUI_IN) / 2}" font-size="9" fill="#6a5a3a"
+      text-anchor="middle" opacity="0.6">會</text>
+    <text x="${cx + (R_YUN + R_YUN_IN) / 2}" y="${cy + 4}" font-size="9" fill="#6a5a3a"
+      text-anchor="middle" opacity="0.6">運</text>
+    <text x="${cx + (R_SHI + R_CORE) / 2}" y="${cy + 4}" font-size="9" fill="#6a5a3a"
+      text-anchor="middle" opacity="0.6">世</text>`;
 
-  // viewBox：包住外圈年份标签
   const pad = 16;
   const extent = R_LABEL + 12;
   const vbMin = cx - extent - pad;
@@ -146,29 +150,26 @@ export function renderEraNesting(container) {
           </radialGradient>
         </defs>
 
-        <!-- 外装饰环 -->
         <circle cx="${cx}" cy="${cy}" r="${R_OUT}" fill="none" stroke="#5a4a32" stroke-width="1.1"/>
         <circle cx="${cx}" cy="${cy}" r="${R_OUT - 5}" fill="none" stroke="#8a7a5a" stroke-width="0.4" stroke-dasharray="2,3"/>
 
-        <!-- 会环 -->
         ${huiSectors}
         <circle cx="${cx}" cy="${cy}" r="${R_HUI}" fill="none" stroke="#5a4a32" stroke-width="1"/>
         <circle cx="${cx}" cy="${cy}" r="${R_HUI_IN}" fill="none" stroke="#8a7a5a" stroke-width="0.7"/>
 
-        <!-- 运环 -->
         <circle cx="${cx}" cy="${cy}" r="${R_YUN}" fill="none" stroke="#aa9a72" stroke-width="0.5"/>
         <circle cx="${cx}" cy="${cy}" r="${R_YUN_IN}" fill="none" stroke="#aa9a72" stroke-width="0.5" stroke-dasharray="2,2"/>
+        <circle cx="${cx}" cy="${cy}" r="${R_SHI}" fill="none" stroke="#c0b090" stroke-width="0.4" stroke-dasharray="2,2"/>
 
         ${curSector}
+        ${curShiSector}
         ${yunTicks}
         ${shiTicks}
         ${pointer}
 
-        <!-- 中心 -->
         <circle cx="${cx}" cy="${cy}" r="${R_CORE}" fill="url(#era-core)" stroke="${ZHU}" stroke-width="1"/>
-        <circle cx="${cx}" cy="${cy}" r="${R_CORE - 6}" fill="none" stroke="${ZHU}" stroke-width="0.4" opacity="0.4"/>
-        <text x="${cx}" y="${cy - 6}" font-size="13" fill="${ZHU}" text-anchor="middle" font-weight="700">元</text>
-        <text x="${cx}" y="${cy + 10}" font-size="9" fill="#6a5a3a" text-anchor="middle">129600年</text>
+        <text x="${cx}" y="${cy - 4}" font-size="13" fill="${ZHU}" text-anchor="middle" font-weight="700">元</text>
+        <text x="${cx}" y="${cy + 10}" font-size="8" fill="#6a5a3a" text-anchor="middle">129600年</text>
 
         ${huiLabels}
         ${ringLabels}
@@ -181,7 +182,7 @@ export function renderEraNesting(container) {
       </div>
     </div>
     <div class="diagram-caption">
-      外環十二會（色帶標示，外圈為約略起始年份），中環運刻度（午會三十運），內環世刻度。
-      朱砂扇區與指針指向 2026 年所在運世。一元 = 12會 = 360運 = 4320世 = 129600年。
+      地支方位：子北（下）、午南（上）、卯東（右）、酉西（左）。外環十二會（朱砂為當前午會，外圈為約略起始年份），
+      中環午會三十運刻度（朱砂為當前第${cur.yunInHui + 1}運），內環當前運內十二世（朱砂為當前第${cur.shiInYun + 1}世）。
     </div>`;
 }
