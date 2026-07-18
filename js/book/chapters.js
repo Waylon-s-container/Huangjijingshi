@@ -5,7 +5,7 @@ export const CHAPTERS = [
   { id: 'ch2',   title: '第二章：先天六十四卦圖', draft: false },
   { id: 'ch3',   title: '第三章：卦氣配法', draft: false },
   { id: 'ch4',   title: '第四章：以史推步', draft: false },
-  { id: 'appendix', title: '附錄：原典索引·注疏·文獻', draft: true },
+  { id: 'appendix', title: '附錄：原典索引·注疏·文獻', draft: false },
 ];
 
 const byId = new Map(CHAPTERS.map(c => [c.id, c]));

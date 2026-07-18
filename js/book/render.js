@@ -28,12 +28,41 @@ function renderToc(currentId) {
   return `<div class="toc-title">目錄</div>${items}`;
 }
 
-// 章节正文：标题 + 各小节（五段式）
+// 章节正文：标题 + 各小节（五段式）；附录用专门的 blocks 渲染
 function renderChapter(chapter) {
+  if (chapter.layout === 'appendix') {
+    const blocks = (chapter.blocks || []).map(renderBlock).join('');
+    return `<h1 class="chapter-title">${chapter.title}</h1>${blocks}`;
+  }
   const sections = (chapter.sections || [])
     .map(s => renderSection(s))
     .join('');
   return `<h1 class="chapter-title">${chapter.title}</h1>${sections}`;
+}
+
+// 附录块渲染
+function renderBlock(block) {
+  switch (block.type) {
+    case 'section_title':
+      return `<h2 class="section-title appx-section">${block.title}</h2>`;
+    case 'paragraph':
+      return `<p class="seg appx-para">${block.text}</p>`;
+    case 'list':
+      return '<ul class="appx-list">' +
+        block.items.map(it =>
+          `<li><span class="appx-term">${it.term}</span><span class="appx-desc">${it.desc}</span></li>`
+        ).join('') + '</ul>';
+    case 'sources':
+      return `<h3 class="appx-sub">${block.title}</h3><ul class="appx-sources">` +
+        block.items.map(s =>
+          `<li><span class="appx-term">${s.name}</span>` +
+          `${s.url ? `<a class="appx-url" href="${s.url}" target="_blank" rel="noopener">${s.url}</a>` : ''}` +
+          `${s.note ? `<span class="appx-desc">　${s.note}</span>` : ''}</li>`
+        ).join('') + '</ul>';
+    default:
+      return '';
+  }
+}
 }
 
 // 五段式小节渲染
