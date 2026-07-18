@@ -40,11 +40,35 @@ export function subscribeLang(fn) {
   return () => listeners.delete(fn);
 }
 
+// 术语保护表：OpenCC 简繁转换会对某些字误转，这些专有名词需强制保留原字。
+// 典型：「乾」卦名会被误转为「干」（干燥的干），但卦名应保留「乾」。
+// 用占位符机制：转换前先把保护词替换为占位符，转换后再还原。
+const PROTECTED_TERMS = [
+  '乾',      // 乾卦（qián），OpenCC 误转为「干」
+];
+
+const PLACEHOLDER_PREFIX = '\uE000'; // 私用区字符，正常文本不会出现
+
 // 核心转换函数：文本经此包装后按当前语言输出。
 // 繁体（默认）原样返回；简体则用 OpenCC 转换。
 // 若 OpenCC 未就绪，降级返回原文（保持繁体）。
 export function t(text) {
   if (typeof text !== 'string') return text;
   if (lang === 'hant' || !toSimplified) return text;
-  return toSimplified(text);
+  // 术语保护：替换为占位符，避免被 OpenCC 误转
+  let work = text;
+  const placeholders = [];
+  PROTECTED_TERMS.forEach((term, i) => {
+    const ph = PLACEHOLDER_PREFIX + i + '\uE001';
+    work = work.split(term).join(ph);
+    placeholders[i] = term;
+  });
+  // OpenCC 转换
+  work = toSimplified(work);
+  // 还原术语
+  placeholders.forEach((term, i) => {
+    const ph = PLACEHOLDER_PREFIX + i + '\uE001';
+    work = work.split(ph).join(term);
+  });
+  return work;
 }
