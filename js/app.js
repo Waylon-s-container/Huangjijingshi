@@ -5,6 +5,7 @@ import { initTimeScrubber } from './ui/timeScrubber.js';
 import { locate, valueYearHexagram, EPOCH_YEAR, YAO_YEAR } from './data/calendar.js';
 import { HEXAGRAMS } from './data/hexagrams.js';
 import { subscribe, getState } from './store.js';
+import { t } from './i18n.js';
 
 const HUI_NAMES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 const MAP_SIZE = 600;
@@ -33,22 +34,22 @@ function renderInfo() {
   // 顶部值年卦卡片
   detailEl.innerHTML = `
     <div class="info-card">
-      <div class="label">值年卦 · ${year}</div>
+      <div class="label">${t('值年卦')} · ${year}</div>
       <div class="hex-display">
         ${gongbiSvg(yearHex.lines)}
         <div>
-          <div class="hex-name">${yearHex.name}</div>
+          <div class="hex-name">${t(yearHex.name)}</div>
         </div>
       </div>
     </div>`;
 
   // 元会运世信息表
   infoTableEl.innerHTML = `
-    <tr><th>會</th><td>${HUI_NAMES[loc.huiIndex]}會（第${loc.huiIndex + 1}會）</td></tr>
-    <tr><th>運</th><td>會內第${loc.yunInHui + 1}運（全元第${loc.yunAbs + 1}運）</td></tr>
-    <tr><th>世</th><td>運內第${loc.shiInYun + 1}世</td></tr>
-    <tr><th>世中年</th><td>第${loc.yearInShi + 1}年</td></tr>
-    <tr class="highlight"><th>所閱卦</th><td>${displayHex.name}</td></tr>
+    <tr><th>${t('會')}</th><td>${t(HUI_NAMES[loc.huiIndex] + '會')}（${t('第')}${loc.huiIndex + 1}${t('會')}）</td></tr>
+    <tr><th>${t('運')}</th><td>${t('會內第')}${loc.yunInHui + 1}${t('運')}（${t('全元第')}${loc.yunAbs + 1}${t('運')}）</td></tr>
+    <tr><th>${t('世')}</th><td>${t('運內第')}${loc.shiInYun + 1}${t('世')}</td></tr>
+    <tr><th>${t('世中年')}</th><td>${t('第')}${loc.yearInShi + 1}${t('年')}</td></tr>
+    <tr class="highlight"><th>${t('所閱卦')}</th><td>${t(displayHex.name)}</td></tr>
   `;
 }
 
@@ -57,12 +58,12 @@ function renderText() {
   const { selectedHexagram } = getState();
   if (!selectedHexagram) {
     textPanelEl.className = 'text-empty';
-    textPanelEl.innerHTML = '點擊圓圖中的卦象<br>以閱其辭';
+    textPanelEl.innerHTML = t('點擊圓圖中的卦象<br>以閱其辭');
     return;
   }
   textPanelEl.className = 'vertical-text';
   // 竖排：卦名（大字）+ 卦辞
-  textPanelEl.innerHTML = `<span class="hex-name-big">${selectedHexagram.name}</span>　${selectedHexagram.judgment}`;
+  textPanelEl.innerHTML = `<span class="hex-name-big">${t(selectedHexagram.name)}</span>　${t(selectedHexagram.judgment)}`;
 }
 
 // 工笔规整卦象 SVG（用于右栏卡片）— 圆角爻、阴爻留白更清晰
@@ -87,32 +88,96 @@ subscribe(() => {
   const { year } = getState();
   const loc = locate(year);
   locatorEl.textContent =
-    `${HUI_NAMES[loc.huiIndex]}會 · 第${loc.yunInHui + 1}運 · 第${loc.shiInYun + 1}世（${year}年）`;
+    t(`${HUI_NAMES[loc.huiIndex]}會 · 第${loc.yunInHui + 1}運 · 第${loc.shiInYun + 1}世（${year}年）`);
 });
 renderInfo();
 renderText();
 
 // 页脚透明声明（设计 §4.5）
-noteEl.textContent =
-  `起算：一元之初（前${-EPOCH_YEAR}）· 人事紀年自堯元年（前${-YAO_YEAR}）· 配卦法：去四正卦六十甲子基準外推法`;
+function setFooterNote() {
+  // 经 i18n.t 包装以支持简繁切换
+  noteEl.textContent = t(`起算：一元之初（前${-EPOCH_YEAR}）· 人事紀年自堯元年（前${-YAO_YEAR}）· 配卦法：去四正卦六十甲子基準外推法`);
+}
+setFooterNote();
 
 // ===== 路由集成：封面 ↔ 教材 =====
 import { start, navigate } from './router.js';
 import { renderChapterView } from './book/index.js';
+import { initI18n, toggleLang, getLang } from './i18n.js';
 
 const coverView = document.getElementById('cover-view');
 const bookView = document.getElementById('book-view');
 
+let currentView = 'cover';   // 'cover' | 'book'
+let currentChapter = null;
+
 function showCover() {
+  currentView = 'cover';
   coverView.hidden = false;
   bookView.hidden = true;
 }
 function showBook(chapterId) {
+  currentView = 'book';
+  currentChapter = chapterId;
   coverView.hidden = true;
   bookView.hidden = false;
   renderChapterView(bookView, chapterId);
   window.scrollTo(0, 0);
 }
+
+// ===== 简繁切换 =====
+function refreshLangButton() {
+  // 按钮显示"对端"语言：繁体模式显示"簡"，简体模式显示"繁"
+  const label = getLang() === 'hant' ? '簡' : '繁';
+  document.querySelectorAll('[data-lang-toggle], #lang-toggle-cover').forEach(btn => {
+    btn.textContent = label;
+  });
+}
+
+function handleToggle() {
+  toggleLang();
+  refreshLangButton();
+  setFooterNote();
+  // 重渲染当前视图
+  if (currentView === 'book' && currentChapter) {
+    renderChapterView(bookView, currentChapter);
+  } else {
+    // 封面：手动重渲染受 lang 影响的部分
+    renderInfo();
+    renderText();
+    applyCoverI18n();
+  }
+}
+
+// 封面固定文本（带 data-i18n 属性）的简繁转换
+function applyCoverI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    // 首次记录原文（繁体），后续基于原文转换
+    if (!el.dataset.i18nOrig) el.dataset.i18nOrig = el.innerHTML;
+    el.innerHTML = t(el.dataset.i18nOrig);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    if (!el.dataset.i18nTitleOrig) el.dataset.i18nTitleOrig = el.getAttribute('title');
+    el.setAttribute('title', t(el.dataset.i18nTitleOrig));
+  });
+}
+applyCoverI18n();
+
+// 绑定切换按钮（封面那个 + 教材内动态生成的都用事件委托）
+document.getElementById('lang-toggle-cover').addEventListener('click', handleToggle);
+document.addEventListener('click', (e) => {
+  if (e.target.matches('[data-lang-toggle]')) handleToggle();
+});
+
+// 初始化 i18n（异步加载 OpenCC）后刷新按钮
+initI18n().then(() => {
+  refreshLangButton();
+  // OpenCC 就绪后，若用户此前已切到简体但当时未就绪，补一次渲染
+  if (getLang() === 'hans' && currentView === 'book' && currentChapter) {
+    renderChapterView(bookView, currentChapter);
+    setFooterNote();
+  }
+});
 
 // 路由表
 start({

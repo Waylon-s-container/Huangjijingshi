@@ -1,6 +1,8 @@
 // 教材渲染：左侧目录 + 右侧正文 + 五段式小节。
 // 纯渲染，不直接持有内容数据（由调用方传入章节对象）。
+// 所有文本输出经 t() 包装以支持简繁切换。
 import { CHAPTERS, getNext, getPrev } from './chapters.js';
+import { t, getLang } from '../i18n.js';
 
 // 渲染整个教材视图到 container。chapter=当前章节内容对象
 export function renderBook(container, chapter) {
@@ -9,8 +11,9 @@ export function renderBook(container, chapter) {
       <aside class="book-toc">${renderToc(chapter.id)}</aside>
       <main class="book-main">
         <header class="book-topbar">
-          <a class="back-cover" href="#/">⟵ 返回封面</a>
-          <span class="chapter-progress">${chapter.title}</span>
+          <a class="back-cover" href="#/">⟵ ${t('返回封面')}</a>
+          <span class="chapter-progress">${t(chapter.title)}</span>
+          <button class="lang-toggle" data-lang-toggle title="${t('切換簡繁')}">${getLang() === 'hant' ? '簡' : '繁'}</button>
         </header>
         <article class="book-content">${renderChapter(chapter)}</article>
         <nav class="chapter-nav">${renderChapterNav(chapter.id)}</nav>
@@ -23,77 +26,76 @@ function renderToc(currentId) {
   const items = CHAPTERS.map(c => {
     const cls = c.id === currentId ? 'toc-item active' : 'toc-item';
     const draftCls = c.draft ? ' draft' : '';
-    return `<a class="${cls}${draftCls}" href="#/book/${c.id}"${c.draft ? ' aria-disabled="true"' : ''}>${c.title}</a>`;
+    return `<a class="${cls}${draftCls}" href="#/book/${c.id}"${c.draft ? ' aria-disabled="true"' : ''}>${t(c.title)}</a>`;
   }).join('');
-  return `<div class="toc-title">目錄</div>${items}`;
+  return `<div class="toc-title">${t('目錄')}</div>${items}`;
 }
 
 // 章节正文：标题 + 各小节（五段式）；附录用专门的 blocks 渲染
 function renderChapter(chapter) {
   if (chapter.layout === 'appendix') {
     const blocks = (chapter.blocks || []).map(renderBlock).join('');
-    return `<h1 class="chapter-title">${chapter.title}</h1>${blocks}`;
+    return `<h1 class="chapter-title">${t(chapter.title)}</h1>${blocks}`;
   }
   const sections = (chapter.sections || [])
     .map(s => renderSection(s))
     .join('');
-  return `<h1 class="chapter-title">${chapter.title}</h1>${sections}`;
+  return `<h1 class="chapter-title">${t(chapter.title)}</h1>${sections}`;
 }
 
 // 附录块渲染
 function renderBlock(block) {
   switch (block.type) {
     case 'section_title':
-      return `<h2 class="section-title appx-section">${block.title}</h2>`;
+      return `<h2 class="section-title appx-section">${t(block.title)}</h2>`;
     case 'paragraph':
-      return `<p class="seg appx-para">${block.text}</p>`;
+      return `<p class="seg appx-para">${t(block.text)}</p>`;
     case 'list':
       return '<ul class="appx-list">' +
         block.items.map(it =>
-          `<li><span class="appx-term">${it.term}</span><span class="appx-desc">${it.desc}</span></li>`
+          `<li><span class="appx-term">${t(it.term)}</span><span class="appx-desc">${t(it.desc)}</span></li>`
         ).join('') + '</ul>';
     case 'sources':
-      return `<h3 class="appx-sub">${block.title}</h3><ul class="appx-sources">` +
+      return `<h3 class="appx-sub">${t(block.title)}</h3><ul class="appx-sources">` +
         block.items.map(s =>
-          `<li><span class="appx-term">${s.name}</span>` +
+          `<li><span class="appx-term">${t(s.name)}</span>` +
           `${s.url ? `<a class="appx-url" href="${s.url}" target="_blank" rel="noopener">${s.url}</a>` : ''}` +
-          `${s.note ? `<span class="appx-desc">　${s.note}</span>` : ''}</li>`
+          `${s.note ? `<span class="appx-desc">　${t(s.note)}</span>` : ''}</li>`
         ).join('') + '</ul>';
     default:
       return '';
   }
-}
 }
 
 // 五段式小节渲染
 function renderSection(section) {
   return `
     <section class="book-section" id="sec-${section.id}">
-      <h2 class="section-title">${section.id} ${section.title}</h2>
-      <div class="seg intro">${section.intro || ''}</div>
+      <h2 class="section-title">${section.id} ${t(section.title)}</h2>
+      <div class="seg intro">${t(section.intro || '')}</div>
       ${section.source ? renderSource(section.source) : ''}
       ${section.commentaries ? renderCommentaries(section.commentaries) : ''}
       ${section.diagram ? `<div class="seg diagram" data-diagram="${section.diagram}"></div>` : ''}
-      ${section.summary ? `<div class="seg summary"><span class="seg-label">要點</span>${section.summary}</div>` : ''}
+      ${section.summary ? `<div class="seg summary"><span class="seg-label">${t('要點')}</span>${t(section.summary)}</div>` : ''}
     </section>`;
 }
 
 function renderSource(src) {
   return `
     <div class="seg source">
-      <div class="seg-label">原典</div>
-      <blockquote class="source-quote">${src.text}</blockquote>
-      <div class="source-cite">— ${src.citation}</div>
+      <div class="seg-label">${t('原典')}</div>
+      <blockquote class="source-quote">${t(src.text)}</blockquote>
+      <div class="source-cite">— ${t(src.citation)}</div>
     </div>`;
 }
 
 function renderCommentaries(list) {
   const items = list.map(c =>
-    `<div class="comm-item"><span class="comm-author">${c.author}</span>` +
-    `${c.work ? `<span class="comm-work">《${c.work}》</span>` : ''}` +
-    `<span class="comm-colon">：</span><span class="comm-text">${c.text}</span></div>`
+    `<div class="comm-item"><span class="comm-author">${t(c.author)}</span>` +
+    `${c.work ? `<span class="comm-work">《${t(c.work)}》</span>` : ''}` +
+    `<span class="comm-colon">：</span><span class="comm-text">${t(c.text)}</span></div>`
   ).join('');
-  return `<div class="seg commentaries"><div class="seg-label">注疏</div>${items}</div>`;
+  return `<div class="seg commentaries"><div class="seg-label">${t('注疏')}</div>${items}</div>`;
 }
 
 // 章末导航：上一章/下一章
@@ -101,12 +103,12 @@ function renderChapterNav(currentId) {
   const prev = getPrev(currentId);
   const next = getNext(currentId);
   const prevHtml = prev
-    ? `<a class="nav-prev" href="#/book/${prev.id}">⟵ ${prev.title}</a>`
+    ? `<a class="nav-prev" href="#/book/${prev.id}">⟵ ${t(prev.title)}</a>`
     : '<span></span>';
   const nextHtml = next
     ? (next.draft
-        ? `<span class="nav-next disabled">${next.title}（待續）⟶</span>`
-        : `<a class="nav-next" href="#/book/${next.id}">${next.title} ⟶</a>`)
+        ? `<span class="nav-next disabled">${t(next.title)}（${t('待續')}）⟶</span>`
+        : `<a class="nav-next" href="#/book/${next.id}">${t(next.title)} ⟶</a>`)
     : '<span></span>';
   return prevHtml + nextHtml;
 }

@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="css/book.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap">
+  <!-- OpenCC 简繁转换（CDN 全局加载，i18n.js 异步等待 window.OpenCC）-->
+  <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
 </head>
 <body>
   <div id="app">
@@ -15,23 +17,24 @@
     <div id="cover-view">
       <header class="top-bar">
         <h1>皇極經世</h1>
-        <a class="enter-book" href="#/book/intro">入讀教材 ⟶</a>
+        <a class="enter-book" href="#/book/intro" data-i18n>入讀教材 ⟶</a>
+        <button class="lang-toggle" id="lang-toggle-cover" title="切換簡繁" data-i18n-title>簡</button>
         <div class="seal">皇極</div>
       </header>
       <main class="stage">
         <section class="col-map">
-          <div class="col-title">六十四卦圓圖</div>
+          <div class="col-title" data-i18n>六十四卦圓圖</div>
           <div class="map-wrap">
             <canvas id="hex-map" width="600" height="600"></canvas>
             <svg id="anchor-layer" width="600" height="600" class="anchor-layer"></svg>
           </div>
         </section>
         <section class="col-text">
-          <div class="col-title">卦辭</div>
+          <div class="col-title" data-i18n>卦辭</div>
           <div id="text-panel" class="text-empty">點擊圓圖中的卦象<br>以閱其辭</div>
         </section>
         <section class="col-info">
-          <div class="col-title">元會運世</div>
+          <div class="col-title" data-i18n>元會運世</div>
           <div id="detail-panel"></div>
           <table class="info-table" id="info-table"></table>
         </section>
