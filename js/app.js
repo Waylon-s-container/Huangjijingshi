@@ -65,17 +65,17 @@ function renderText() {
   textPanelEl.innerHTML = `<span class="hex-name-big">${selectedHexagram.name}</span>　${selectedHexagram.judgment}`;
 }
 
-// 工笔规整卦象 SVG（用于右栏卡片）
+// 工笔规整卦象 SVG（用于右栏卡片）— 圆角爻、阴爻留白更清晰
 function gongbiSvg(lines) {
   let yao = '';
   for (let i = 5; i >= 0; i--) {
     const yang = lines[i] === '1';
-    const y = 6 + (5 - i) * 9;
+    const y = 5 + (5 - i) * 9.2;
     if (yang) {
-      yao += `<rect x="6" y="${y}" width="44" height="5" fill="#1a1410"/>`;
+      yao += `<rect x="6" y="${y}" width="44" height="5" rx="1" fill="#1a1410"/>`;
     } else {
-      yao += `<rect x="6" y="${y}" width="18" height="5" fill="#1a1410"/>`;
-      yao += `<rect x="32" y="${y}" width="18" height="5" fill="#1a1410"/>`;
+      yao += `<rect x="6" y="${y}" width="17" height="5" rx="1" fill="#1a1410"/>`;
+      yao += `<rect x="33" y="${y}" width="17" height="5" rx="1" fill="#1a1410"/>`;
     }
   }
   return `<svg viewBox="0 0 56 60" class="dp-svg">${yao}</svg>`;
@@ -121,5 +121,6 @@ start({
   '/book/intro': () => showBook('intro'),
   '/book/ch1': () => showBook('ch1'),
   '/book/ch2': () => showBook('ch2'),
+  '/book/ch3': () => showBook('ch3'),
   '*': () => showBook('intro'), // 兜底：后续章节等回导言（draft 章节会显示"待续"）
 });

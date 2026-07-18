@@ -2,13 +2,14 @@
 import intro from './intro.js';
 import ch1 from './ch1.js';
 import ch2 from './ch2.js';
+import ch3 from './ch3.js';
 import { renderBook } from './render.js';
 import { renderEraNesting } from './diagrams/eraNesting.js';
 import { renderFangyuanTu } from './diagrams/fangyuanTu.js';
 import { renderXiaoXi } from './diagrams/xiaoXi.js';
 import { renderTimeLocator } from './diagrams/timeLocator.js';
 
-const CHAPTER_DATA = { intro, ch1, ch2 };
+const CHAPTER_DATA = { intro, ch1, ch2, ch3 };
 const DIAGRAMS = {
   eraNesting: renderEraNesting,
   fangyuanTu: renderFangyuanTu,
