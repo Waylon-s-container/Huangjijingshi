@@ -1,6 +1,7 @@
 // 64卦数据。lines 为6位二进制，自下而上（lines[0]=初爻，lines[5]=上爻）。
 // 1=阳爻(━━━)，0=阴爻(━ ━)。四正卦 isCardinal=true（乾坤坎离），不参与值年配卦。
-// 卦序按先天六十四卦圆图（复起），同人锚定 id=13（值年配卦回归基准，见 Task 5）。
+// 卦序按先天六十四卦圆图（复起），去四正后60卦配60甲子。
+// 同人=2026值年锚点：calendar.js 按卦名 findIndex 查找，不依赖固定 id（同人圆图序为第15卦）。
 // judgment 取《周易》通行本卦辞（公有领域）。
 export const HEXAGRAMS = [
   { id:  1, name: '复', lines: '100000', judgment: '亨。出入无疾，朋来无咎。反复其道，七日来复，利有攸往。' },
@@ -15,9 +16,9 @@ export const HEXAGRAMS = [
   { id: 10, name: '贲', lines: '101001', judgment: '亨。小利有攸往。' },
   { id: 11, name: '既济', lines: '101010', judgment: '亨小，利贞。初吉终乱。' },
   { id: 12, name: '家人', lines: '101011', judgment: '利女贞。' },
-  { id: 13, name: '同人', lines: '101111', judgment: '同人于野，亨。利涉大川，利君子贞。' },
-  { id: 14, name: '丰', lines: '101100', judgment: '亨。王假之，勿忧，宜日中。' },
-  { id: 15, name: '革', lines: '101110', judgment: '巳日乃孚，元亨，利贞，悔亡。' },
+  { id: 13, name: '丰', lines: '101100', judgment: '亨。王假之，勿忧，宜日中。' },
+  { id: 14, name: '革', lines: '101110', judgment: '巳日乃孚，元亨，利贞，悔亡。' },
+  { id: 15, name: '同人', lines: '101111', judgment: '同人于野，亨。利涉大川，利君子贞。' },
   { id: 16, name: '临', lines: '110000', judgment: '元亨，利贞。至于八月有凶。' },
   { id: 17, name: '损', lines: '110001', judgment: '有孚，元吉，无咎，可贞，利有攸往。' },
   { id: 18, name: '节', lines: '110010', judgment: '亨。苦节，不可贞。' },
@@ -39,7 +40,7 @@ export const HEXAGRAMS = [
   { id: 34, name: '鼎', lines: '011101', judgment: '元吉，亨。' },
   { id: 35, name: '恒', lines: '011100', judgment: '亨，无咎，利贞，利有攸往。' },
   { id: 36, name: '巽', lines: '011011', judgment: '小亨，利有攸往，利见大人。' },
-  { id: 37, name: '井', lines: '011010', judgment: '改邑不改井，无丧无得。' },
+  { id: 37, name: '井', lines: '011010', judgment: '改邑不改井，无丧无得，往来井井。汔至，亦未繘井，羸其瓶，凶。' },
   { id: 38, name: '蛊', lines: '011001', judgment: '元亨，利涉大川。先甲三日，后甲三日。' },
   { id: 39, name: '升', lines: '011000', judgment: '元亨，用见大人，勿恤，南征吉。' },
   { id: 40, name: '讼', lines: '010111', judgment: '有孚窒惕，中吉，终凶。利见大人，不利涉大川。' },

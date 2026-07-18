@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>P1 增强方向</title>
+<style>
+  :root {
+    --paper: #f4ecd8;
+    --ink: #2a2418;
+    --ink-light: #6a5a3a;
+    --line: #8a7a5a;
+    --zhu: #a02020;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Noto Serif SC', serif; }
+  h2 { text-align: center; padding: 24px; letter-spacing: 6px; font-size: 22px; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 30px 40px; max-width: 1100px; margin: 0 auto; }
+  .opt { border: 1px solid var(--line); background: rgba(235,224,200,0.4); padding: 20px; cursor: pointer; transition: all 0.2s; }
+  .opt:hover { border-color: var(--zhu); box-shadow: 0 0 8px rgba(160,32,32,0.15); }
+  .opt h3 { font-size: 15px; margin-bottom: 10px; letter-spacing: 2px; }
+  .opt p { font-size: 11px; color: var(--ink-light); line-height: 1.7; }
+  .opt .preview { margin-top: 12px; background: var(--paper); border: 1px solid var(--line); height: 200px; position: relative; overflow: hidden; }
+</style>
+</head>
+<body>
+<h2>P1 视觉增强方向</h2>
+<div class="options">
+
+  <!-- A: 装饰环+天文仪器感 -->
+  <div class="opt">
+    <h3>A · 浑天仪环</h3>
+    <p>主图外增加多层装饰同心环（天干、地支、度数刻度），像古代浑天仪/罗盘。卦象圆图嵌在内环中。有天文观测工具的仪式感。</p>
+    <div class="preview">
+      <svg viewBox="0 0 260 200" style="width:100%;height:100%">
+        <circle cx="130" cy="100" r="90" fill="none" stroke="#8a7a5a" stroke-width="0.8"/>
+        <circle cx="130" cy="100" r="82" fill="none" stroke="#8a7a5a" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <circle cx="130" cy="100" r="70" fill="none" stroke="#8a7a5a" stroke-width="1"/>
+        <!-- 地支刻度 -->
+        <g font-size="8" fill="#6a5a3a" text-anchor="middle">
+          <text x="130" y="14">子</text><text x="163" y="18">丑</text><text x="193" y="30">寅</text>
+          <text x="215" y="48">卯</text><text x="228" y="72">辰</text><text x="232" y="100">巳</text>
+          <text x="228" y="128">午</text><text x="215" y="152">未</text><text x="193" y="170">申</text>
+          <text x="163" y="182">酉</text><text x="130" y="186">戌</text><text x="97" y="182">亥</text>
+        </g>
+        <!-- 刻度线 -->
+        <g stroke="#aa9a72" stroke-width="0.5">
+          <line x1="130" y1="12" x2="130" y2="18"/><line x1="222" y1="100" x2="228" y2="100"/>
+          <line x1="130" y1="188" x2="130" y2="182"/><line x1="38" y1="100" x2="32" y2="100"/>
+        </g>
+        <!-- 卦象小点 -->
+        <g fill="#3a3022" opacity="0.7">
+          <circle cx="130" cy="18" r="2.5"/><circle cx="148" cy="22" r="2"/><circle cx="164" cy="32" r="2"/>
+          <circle cx="176" cy="46" r="2"/><circle cx="184" cy="62" r="2"/><circle cx="188" cy="80" r="2"/>
+          <circle cx="188" cy="100" r="2.5" fill="#a02020"/><circle cx="184" cy="120" r="2"/>
+          <circle cx="176" cy="136" r="2"/><circle cx="164" cy="150" r="2"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- B: 古籍版式+边框装饰 -->
+  <div class="opt">
+    <h3>B · 古籍版式</h3>
+    <p>整体像翻开一本线装古籍：双线边框、鱼尾标记、版心刻线、天头地脚留白。卦象圆图是插图，周围是竖排文字注释。书卷气。</p>
+    <div class="preview">
+      <svg viewBox="0 0 260 200" style="width:100%;height:100%">
+        <!-- 双线边框 -->
+        <rect x="12" y="12" width="236" height="176" fill="none" stroke="#8a7a5a" stroke-width="1.5"/>
+        <rect x="16" y="16" width="228" height="168" fill="none" stroke="#8a7a5a" stroke-width="0.5"/>
+        <!-- 鱼尾标记 -->
+        <g fill="#8a7a5a">
+          <polygon points="130,18 124,24 136,24"/>
+          <polygon points="130,182 124,176 136,176"/>
+        </g>
+        <!-- 版心竖线 -->
+        <line x1="130" y1="24" x2="130" y2="176" stroke="#8a7a5a" stroke-width="0.3" stroke-dasharray="2,4"/>
+        <!-- 竖排文字区域 -->
+        <g font-size="8" fill="#2a2418" writing-mode="vertical-rl">
+          <text x="50" y="36">皇極經世書</text>
+          <text x="68" y="36">以會經運</text>
+          <text x="86" y="36">天火同人</text>
+        </g>
+        <!-- 右侧插图区域(卦象) -->
+        <circle cx="190" cy="100" r="45" fill="none" stroke="#5a4a32" stroke-width="1"/>
+        <circle cx="190" cy="100" r="4" fill="#a02020" opacity="0.6"/>
+        <g fill="#3a3022" opacity="0.6">
+          <circle cx="190" cy="55" r="1.5"/><circle cx="205" cy="60" r="1.5"/>
+          <circle cx="218" cy="72" r="1.5"/><circle cx="224" cy="90" r="1.5"/>
+          <circle cx="224" cy="110" r="1.5"/><circle cx="218" cy="128" r="1.5"/>
+          <circle cx="205" cy="140" r="1.5"/><circle cx="190" cy="145" r="1.5"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- C: 全屏沉浸+粒子氛围 -->
+  <div class="opt">
+    <h3>C · 沉浸星象</h3>
+    <p>全屏深色调（墨色/藏蓝），卦象发光（金/青荧光），当前时刻是呼吸光点。背景有微弱粒子飘动（墨点/星尘）。神秘宏大，更偏"宇宙感"。</p>
+    <div class="preview">
+      <svg viewBox="0 0 260 200" style="width:100%;height:100%">
+        <rect width="260" height="200" fill="#0d0f14"/>
+        <!-- 星尘粒子 -->
+        <g fill="#a08040" opacity="0.3">
+          <circle cx="20" cy="30" r="0.5"/><circle cx="80" cy="15" r="0.8"/>
+          <circle cx="140" cy="25" r="0.6"/><circle cx="200" cy="10" r="0.5"/>
+          <circle cx="50" cy="80" r="0.7"/><circle cx="230" cy="60" r="0.5"/>
+          <circle cx="30" cy="140" r="0.6"/><circle cx="180" cy="170" r="0.7"/>
+          <circle cx="100" cy="180" r="0.5"/><circle cx="240" cy="130" r="0.8"/>
+          <circle cx="60" cy="50" r="0.4"/><circle cx="150" cy="95" r="0.5"/>
+          <circle cx="210" cy="150" r="0.6"/><circle cx="120" cy="40" r="0.4"/>
+        </g>
+        <!-- 卦象圆环 -->
+        <circle cx="130" cy="100" r="70" fill="none" stroke="#3a3528" stroke-width="0.8"/>
+        <!-- 发光卦象 -->
+        <g fill="#c8a040" opacity="0.6">
+          <circle cx="130" cy="30" r="2"/><circle cx="160" cy="38" r="1.8"/>
+          <circle cx="186" cy="55" r="1.8"/><circle cx="200" cy="80" r="1.8"/>
+          <circle cx="200" cy="105" r="2.5" fill="#a02020"/>
+          <circle cx="186" cy="130" r="1.8"/><circle cx="160" cy="148" r="1.8"/>
+          <circle cx="130" cy="155" r="1.8"/><circle cx="100" cy="148" r="1.8"/>
+        </g>
+        <!-- 当前卦光晕 -->
+        <circle cx="200" cy="105" r="10" fill="#a02020" opacity="0.08"/>
+        <circle cx="200" cy="105" r="6" fill="#a02020" opacity="0.15"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- D: 信息密度+多面板 -->
+  <div class="opt">
+    <h3>D · 信息密度</h3>
+    <p>保持古籍风但增加信息密度：左右多栏布局（卦象圆图+年表+五行信息+卦辞解读），像一个"学者工作台"。信息量更充实，不像一张空图。</p>
+    <div class="preview">
+      <svg viewBox="0 0 260 200" style="width:100%;height:100%">
+        <rect width="260" height="200" fill="#f4ecd8"/>
+        <!-- 三栏布局线 -->
+        <line x1="90" y1="0" x2="90" y2="200" stroke="#8a7a5a" stroke-width="0.5"/>
+        <line x1="180" y1="0" x2="180" y2="200" stroke="#8a7a5a" stroke-width="0.5"/>
+        <!-- 左栏: 卦象小圆 -->
+        <circle cx="45" cy="100" r="35" fill="none" stroke="#5a4a32" stroke-width="0.8"/>
+        <g fill="#3a3022" opacity="0.6"><circle cx="45" cy="65" r="1.5"/><circle cx="60" cy="72" r="1.5"/><circle cx="70" cy="86" r="1.5"/><circle cx="75" cy="100" r="1.5" fill="#a02020"/><circle cx="70" cy="114" r="1.5"/><circle cx="60" cy="128" r="1.5"/></g>
+        <text x="45" y="155" font-size="7" fill="#6a5a3a" text-anchor="middle">午会·同人</text>
+        <!-- 中栏: 竖排卦辞 -->
+        <g font-size="7" fill="#2a2418" writing-mode="vertical-rl">
+          <text x="115" y="24">同人于野</text><text x="128" y="24">亨</text><text x="141" y="24">利涉大川</text>
+        </g>
+        <text x="135" y="130" font-size="6" fill="#6a5a3a" text-anchor="middle">卦辞</text>
+        <!-- 右栏: 信息表格 -->
+        <g font-size="6" fill="#2a2418">
+          <text x="190" y="24">午七会</text><text x="190" y="38">第12运</text><text x="190" y="52">第10世</text>
+          <line x1="186" y1="58" x2="245" y2="58" stroke="#aa9a72" stroke-width="0.3"/>
+          <text x="190" y="72" fill="#6a5a3a">天火同人</text><text x="190" y="86">上火下天</text><text x="190" y="100">离(三)·乾(上)</text>
+          <line x1="186" y1="108" x2="245" y2="108" stroke="#aa9a72" stroke-width="0.3"/>
+          <text x="190" y="122" fill="#a02020">2026丙午年</text><text x="190" y="136">值年卦</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

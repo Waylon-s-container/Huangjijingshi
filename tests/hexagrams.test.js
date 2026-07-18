@@ -26,5 +26,6 @@ test('四正卦标记正确', () => {
 
 test('getById / getByName 查找', () => {
   assert.equal(getById(1).name, '复');
-  assert.equal(getByName('同人').id, 13);
+  // 同人按先天圆图序为去四正后第15卦（id=15）；值年锚点由 calendar.js 按名查找
+  assert.equal(getByName('同人').id, 15);
 });

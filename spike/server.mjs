@@ -1,9 +1,10 @@
 // 最小静态服务器，用于预览 spike 和最终页面（ESM import 需要 http 协议）
+// Windows 兼容：用 path.resolve 做路径解析与越界检查。
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { extname, join, normalize } from 'node:path';
+import { extname, resolve, sep } from 'node:path';
 
-const ROOT = process.argv[2] || '.';
+const ROOT = resolve(process.argv[2] || '.');
 const PORT = parseInt(process.argv[3] || '8765', 10);
 
 const MIME = {
@@ -18,12 +19,25 @@ const MIME = {
   '.woff2': 'font/woff2',
 };
 
+function safeJoin(root, urlPath) {
+  // 去掉 query，解码，去掉开头的 /
+  let rel = decodeURIComponent(urlPath.split('?')[0]);
+  if (rel === '/') rel = '/index.html';
+  // 防止绝对路径与盘符注入
+  rel = rel.replace(/^[/\\]+/, '');
+  const filePath = resolve(root, rel);
+  // 越界检查：必须仍在 root 之下（含 root 自身）
+  const rootWithSep = root.endsWith(sep) ? root : root + sep;
+  if (filePath !== root && !filePath.startsWith(rootWithSep)) {
+    return null;
+  }
+  return filePath;
+}
+
 const server = http.createServer(async (req, res) => {
   try {
-    let urlPath = decodeURIComponent(req.url.split('?')[0]);
-    if (urlPath === '/') urlPath = '/index.html';
-    const filePath = normalize(join(ROOT, urlPath));
-    if (!filePath.startsWith(normalize(ROOT))) {
+    const filePath = safeJoin(ROOT, req.url || '/');
+    if (!filePath) {
       res.writeHead(403); res.end('forbidden'); return;
     }
     const data = await readFile(filePath);
@@ -34,6 +48,6 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`serving ${ROOT} at http://localhost:${PORT}`);
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`serving ${ROOT} at http://127.0.0.1:${PORT}`);
 });
