@@ -14,6 +14,11 @@ import { renderEraNesting } from './diagrams/eraNesting.js';
 import { renderFangyuanTu } from './diagrams/fangyuanTu.js';
 import { renderXiaoXi } from './diagrams/xiaoXi.js';
 import { renderTimeLocator } from './diagrams/timeLocator.js';
+import { renderEraDrill } from './diagrams/eraDrill.js';
+import { renderSanCai } from './diagrams/sanCai.js';
+import { renderHistoryTimeline } from './diagrams/historyTimeline.js';
+import { renderShengHe } from './diagrams/shengHe.js';
+import { renderZhiLuan } from './diagrams/zhiLuan.js';
 
 const CHAPTER_DATA = { intro, ch1, ch2, ch3, chshu, chguan, chnian, chsheng, ch4, appendix };
 const DIAGRAMS = {
@@ -21,6 +26,11 @@ const DIAGRAMS = {
   fangyuanTu: renderFangyuanTu,
   xiaoXi: renderXiaoXi,
   timeLocator: renderTimeLocator,
+  eraDrill: renderEraDrill,
+  sanCai: renderSanCai,
+  historyTimeline: renderHistoryTimeline,
+  shengHe: renderShengHe,
+  zhiLuan: renderZhiLuan,
 };
 
 // 渲染教材某章节到 container

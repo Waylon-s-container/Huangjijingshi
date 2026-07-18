@@ -1,9 +1,5 @@
-// 阴阳消息消长图：十二消息卦 + 阳爻数量色深变化。
-// 展示"消息"（消=阴长阳消，息=阳长）的核心概念。
-// 十二消息卦：复(1阳)→临(2)→泰(3)→大壮(4)→夬(5)→乾(6阳极)→姤(1阴)→遁→否→观→剥→坤(6阴极)
-// 用阳爻数量决定底色深浅：阳多=暖色深，阳少=冷色深。
-
-// 十二消息卦（自下而上6爻，1=阳）
+// 阴阳消息消长图（美化版）：
+// 十二消息卦横向展开，阳息/阴消分区，阳气柱状起伏，迷你卦象。
 const XIAOXI = [
   { name: '復',  lines: '100000', yang: 1, month: '子', desc: '一陽來復' },
   { name: '臨',  lines: '110000', yang: 2, month: '丑', desc: '陽長' },
@@ -19,18 +15,22 @@ const XIAOXI = [
   { name: '坤',  lines: '000000', yang: 0, month: '亥', desc: '純陰' },
 ];
 
+const ZHU = '#a02020';
+const INK = '#2a2418';
+
 function miniHex(lines, w, h, stroke) {
-  const yh = h / 8;
+  const yh = Math.max(1.4, h / 9);
+  const gap = (h - yh * 6) / 5;
   let r = '';
   for (let i = 5; i >= 0; i--) {
     const yang = lines[i] === '1';
-    const y = (5 - i) * (h / 6) + yh / 2;
+    const y = (5 - i) * (yh + gap);
     if (yang) {
-      r += `<rect x="0" y="${y.toFixed(1)}" width="${w}" height="${yh.toFixed(1)}" fill="${stroke}"/>`;
+      r += `<rect x="0" y="${y.toFixed(1)}" width="${w}" height="${yh.toFixed(1)}" rx="0.5" fill="${stroke}"/>`;
     } else {
-      const gw = w * 0.4;
-      r += `<rect x="0" y="${y.toFixed(1)}" width="${gw}" height="${yh.toFixed(1)}" fill="${stroke}" opacity="0.5"/>`;
-      r += `<rect x="${w - gw}" y="${y.toFixed(1)}" width="${gw}" height="${yh.toFixed(1)}" fill="${stroke}" opacity="0.5"/>`;
+      const gw = w * 0.38;
+      r += `<rect x="0" y="${y.toFixed(1)}" width="${gw}" height="${yh.toFixed(1)}" rx="0.5" fill="${stroke}" opacity="0.55"/>`;
+      r += `<rect x="${(w - gw).toFixed(1)}" y="${y.toFixed(1)}" width="${gw}" height="${yh.toFixed(1)}" rx="0.5" fill="${stroke}" opacity="0.55"/>`;
     }
   }
   return r;
@@ -38,41 +38,71 @@ function miniHex(lines, w, h, stroke) {
 
 export function renderXiaoXi(container) {
   const cols = XIAOXI.length;
-  const colW = 48;
-  const totalW = cols * colW;
-  const baseX = 20, baseY = 30;
+  const colW = 52;
+  const padL = 28, padR = 28;
+  const totalW = padL + cols * colW + padR;
+  const baseY = 48;
+  const barMaxH = 56;
+  const hexY = baseY + barMaxH + 18;
+
+  // 背景分区
+  const midX = padL + 6 * colW;
+  const bg = `
+    <rect x="${padL}" y="28" width="${6 * colW}" height="200" fill="${ZHU}" opacity="0.04" rx="4"/>
+    <rect x="${midX}" y="28" width="${6 * colW}" height="200" fill="${INK}" opacity="0.04" rx="4"/>
+    <line x1="${midX}" y1="28" x2="${midX}" y2="228" stroke="${ZHU}" stroke-width="1" stroke-dasharray="4,3" opacity="0.35"/>
+    <text x="${padL + 3 * colW}" y="20" font-size="11" fill="${ZHU}" text-anchor="middle" font-weight="700">陽息（陽長）⟶</text>
+    <text x="${midX + 3 * colW}" y="20" font-size="11" fill="${INK}" text-anchor="middle" font-weight="700">⟵ 陰消（陰長）</text>`;
+
+  // 阳气起伏折线路径
+  let wavePts = [];
+  XIAOXI.forEach((x, i) => {
+    const cx = padL + i * colW + colW / 2;
+    const barH = (x.yang / 6) * barMaxH;
+    const y = baseY + barMaxH - barH;
+    wavePts.push(`${cx},${y}`);
+  });
+  const wave = `
+    <polyline points="${wavePts.join(' ')}" fill="none" stroke="${ZHU}" stroke-width="1.5" opacity="0.5"/>
+    <polyline points="${wavePts.join(' ')} ${padL + (cols - 0.5) * colW},${baseY + barMaxH} ${padL + 0.5 * colW},${baseY + barMaxH}"
+      fill="${ZHU}" opacity="0.06" stroke="none"/>`;
+
   let items = '';
   XIAOXI.forEach((x, i) => {
-    const cx = baseX + i * colW + colW / 2;
-    // 色深：阳爻越多越暖（朱砂），越少越冷（墨）
-    const yangRatio = x.yang / 6;
-    // 背景：阳长用暖色渐变，阴长用冷色
+    const cx = padL + i * colW + colW / 2;
     const isYangHalf = i < 6;
-    const bgOpacity = 0.05 + (isYangHalf ? yangRatio : (1 - yangRatio)) * 0.12;
-    const bgColor = isYangHalf ? '#a02020' : '#2a2418';
+    const barH = Math.max(4, (x.yang / 6) * barMaxH);
+    const barY = baseY + barMaxH - barH;
+    const barColor = isYangHalf ? ZHU : INK;
+    const peak = x.yang === 6 || x.yang === 0;
+
     items += `
-      <g transform="translate(${cx},${baseY})">
-        <rect x="-20" y="-4" width="40" height="120" fill="${bgColor}" opacity="${bgOpacity.toFixed(2)}" rx="2"/>
-        <text x="0" y="6" font-size="10" fill="#6a5a3a" text-anchor="middle">${x.month}月</text>
-        <g transform="translate(-10, 14)">${miniHex(x.lines, 20, 28, '#1a1410')}</g>
-        <text x="0" y="58" font-size="13" fill="#2a2418" text-anchor="middle" font-weight="700">${x.name}</text>
-        <text x="0" y="72" font-size="8" fill="#6a5a3a" text-anchor="middle">陽${x.yang}</text>
-        <text x="0" y="86" font-size="8" fill="#6a5a3a" text-anchor="middle">${x.desc}</text>
+      <g>
+        <!-- 阳气柱 -->
+        <rect x="${cx - 10}" y="${barY}" width="20" height="${barH}"
+          fill="${barColor}" opacity="${0.12 + x.yang * 0.06}" rx="2"/>
+        <rect x="${cx - 10}" y="${barY}" width="20" height="2"
+          fill="${barColor}" opacity="0.55" rx="1"/>
+        <!-- 月支 -->
+        <text x="${cx}" y="${baseY + barMaxH + 14}" font-size="10" fill="#6a5a3a" text-anchor="middle">${x.month}</text>
+        <!-- 卦象 -->
+        <g transform="translate(${cx - 11}, ${hexY})">${miniHex(x.lines, 22, 32, INK)}</g>
+        <!-- 卦名 -->
+        <text x="${cx}" y="${hexY + 48}" font-size="13" fill="${peak ? ZHU : INK}"
+          text-anchor="middle" font-weight="700">${x.name}</text>
+        <text x="${cx}" y="${hexY + 62}" font-size="9" fill="#6a5a3a" text-anchor="middle">陽${x.yang}</text>
+        <text x="${cx}" y="${hexY + 76}" font-size="8" fill="#6a5a3a" text-anchor="middle">${x.desc}</text>
       </g>`;
   });
-  // 阳长/阴消分隔线（乾与姤之间）
-  const divX = baseX + 6 * colW;
 
   container.innerHTML = `
-    <svg viewBox="0 0 ${totalW + 40} 160" class="diagram-svg" style="max-width:600px">
-      <!-- 阳长区域标注 -->
-      <text x="${baseX + 3 * colW / 2 + colW / 2}" y="14" font-size="10" fill="#a02020" text-anchor="middle" font-weight="700">陽息（陽長）⟶</text>
-      <text x="${baseX + 9 * colW}" y="14" font-size="10" fill="#2a2418" text-anchor="middle" font-weight="700">⟵ 陰消（陰長）</text>
-      <line x1="${divX}" y1="20" x2="${divX}" y2="150" stroke="#a02020" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.4"/>
+    <svg viewBox="0 0 ${totalW} 250" class="diagram-svg" style="max-width:680px">
+      ${bg}
+      ${wave}
       ${items}
     </svg>
     <div class="diagram-caption">
       十二消息卦：左半陽息（復→乾，一陽漸長至純陽），右半陰消（姤→坤，一陰漸長至純陰）。
-      底色深淺對應陽氣盛衰。此為皇極經世配卦的陰陽節律基礎。
+      柱高與折線對應陽爻多寡，是皇極經世配卦的陰陽節律基礎。
     </div>`;
 }

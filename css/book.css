@@ -143,6 +143,51 @@
   margin-right: auto;
 }
 
+/* 元会运世嵌套圈 */
+.era-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.era-svg { max-width: 480px; display: block; }
+.era-card {
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+  padding: 10px 14px 12px;
+  background:
+    linear-gradient(135deg, rgba(160,32,32,0.05) 0%, rgba(235,224,200,0.55) 100%);
+  border: 1px solid rgba(160,32,32,0.35);
+  position: relative;
+}
+.era-card::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(160,32,32,0.1);
+  pointer-events: none;
+}
+.era-card-title {
+  font-size: 11px;
+  color: var(--zhu);
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.era-card-main {
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.era-card-sub {
+  font-size: 11px;
+  color: var(--ink-light);
+  margin-top: 3px;
+  letter-spacing: 1px;
+}
+
 /* 方圆图交互 */
 .fy-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .fy-svg { max-width: 500px; display: block; }
@@ -420,7 +465,105 @@
 }
 .appx-url:hover { color: var(--zhu); border-bottom-color: var(--zhu); }
 
+/* ===== 交互图解通用 ===== */
+.drill-box, .sancai-box, .htl-box, .sh-box, .zl-box {
+  background: rgba(235,224,200,0.4);
+  border: 1px solid var(--line);
+  padding: 18px;
+  margin: 16px 0;
+}
+
+/* 图解1: 元会运世层级钻取 */
+.drill-row { display: flex; gap: 12px; align-items: baseline; margin-bottom: 10px; }
+.drill-label { font-size: 12px; color: var(--zhu); letter-spacing: 3px; font-weight: 700; }
+.drill-val { font-size: 13px; color: var(--ink); }
+.drill-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 8px; }
+.drill-cell {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 12px; padding: 6px 4px; text-align: center;
+  background: var(--paper); border: 1px solid var(--line);
+  color: var(--ink); cursor: pointer; transition: all 0.15s;
+}
+.drill-cell:hover { border-color: var(--zhu); }
+.drill-cell.open { background: rgba(160,32,32,0.08); border-color: var(--zhu); }
+.drill-cell.current { color: var(--zhu); font-weight: 700; border-color: var(--zhu); }
+.drill-expand { margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(138,122,90,0.4); }
+.drill-sublabel { font-size: 11px; color: var(--ink-light); margin-bottom: 6px; letter-spacing: 1px; }
+.drill-grid-sm { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; margin-bottom: 8px; }
+.drill-cell-sm {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 10px; padding: 4px 2px; text-align: center;
+  background: var(--paper); border: 1px solid rgba(138,122,90,0.5);
+  color: var(--ink); cursor: pointer;
+}
+.drill-cell-sm.open { background: rgba(160,32,32,0.08); border-color: var(--zhu); }
+.drill-cell-sm.current { color: var(--zhu); font-weight: 700; border-color: var(--zhu); }
+
+/* 图解2: 三才框架 */
+.sancai-head, .sancai-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; }
+.sancai-col-title { background: rgba(138,122,90,0.15); padding: 8px; text-align: center; font-weight: 700; letter-spacing: 3px; }
+.sancai-col-title.tian { color: var(--zhu); }
+.sancai-col-title.ren { color: #5a4a8a; }
+.sancai-col-title.wu { color: var(--ink-light); }
+.sancai-row { margin-top: 1px; transition: background 0.15s; }
+.sancai-row.hover { background: rgba(160,32,32,0.05); }
+.sancai-cell {
+  padding: 12px 8px; text-align: center; font-size: 14px;
+  background: rgba(244,236,216,0.6); cursor: pointer; transition: all 0.15s;
+}
+.sancai-cell:hover { background: rgba(160,32,32,0.1); }
+.sancai-quote { margin-top: 14px; padding: 12px; background: rgba(160,32,32,0.04); border-left: 3px solid var(--zhu); font-size: 13px; color: var(--ink-light); }
+.scq-term { color: var(--zhu); font-weight: 700; font-size: 15px; }
+.scq-quote { display: block; margin-top: 6px; color: var(--ink); font-size: 14px; }
+.scq-cite { display: block; margin-top: 4px; font-size: 11px; color: var(--ink-light); }
+
+/* 图解3: 历史时间轴 */
+.htl-track-wrap { position: relative; padding: 30px 0 10px; }
+.htl-marks { position: absolute; top: 0; left: 0; right: 0; height: 28px; }
+.htl-mark { position: absolute; transform: translateX(-50%); cursor: pointer; text-align: center; }
+.htl-mark-tick { width: 1px; height: 6px; background: var(--line); margin: 0 auto; }
+.htl-mark-label { font-size: 10px; color: var(--ink-light); margin-top: 2px; }
+.htl-mark:hover .htl-mark-label { color: var(--zhu); }
+.htl-track { position: relative; height: 4px; background: var(--line); cursor: pointer; touch-action: none; }
+.htl-cursor { position: absolute; top: -6px; width: 16px; height: 16px; background: var(--zhu); border-radius: 50%; transform: translateX(-50%); }
+.htl-result { margin-top: 14px; padding: 12px; background: rgba(160,32,32,0.06); border-left: 3px solid var(--zhu); }
+.htl-year { font-size: 18px; font-weight: 700; color: var(--zhu); margin-bottom: 4px; }
+.htl-loc { font-size: 13px; color: var(--ink); }
+.htl-loc small { color: var(--ink-light); font-size: 10px; }
+.htl-era { font-size: 11px; color: var(--ink-light); margin-top: 4px; }
+
+/* 图解4: 声音唱和 */
+.sh-explain { font-size: 12px; color: var(--ink-light); margin-bottom: 10px; line-height: 1.7; }
+.sh-grid { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.sh-cell { background: var(--paper); padding: 6px 2px; text-align: center; font-size: 11px; color: var(--ink); cursor: pointer; transition: all 0.1s; }
+.sh-cell small { display: block; font-size: 9px; color: var(--ink-light); }
+.sh-corner { background: rgba(138,122,90,0.1); font-size: 10px; cursor: default; }
+.sh-head-di { background: rgba(160,32,32,0.08); color: var(--zhu); font-weight: 700; }
+.sh-head-tian { background: rgba(90,74,138,0.08); color: #5a4a8a; font-weight: 700; }
+.sh-cell.selected { background: rgba(160,32,32,0.15); }
+.sh-cell.cross { background: var(--zhu); color: var(--paper); font-weight: 700; }
+.sh-result { margin-top: 14px; }
+.sh-result-row { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px dashed rgba(138,122,90,0.3); font-size: 13px; }
+.sh-label { color: var(--ink-light); min-width: 70px; }
+.sh-val { color: var(--ink); }
+.sh-result-row.sh-cross .sh-val { color: var(--zhu); font-weight: 700; }
+.sh-note { font-size: 10px; color: var(--ink-light); margin-top: 8px; font-style: italic; }
+
+/* 图解5: 治乱循环 */
+.zl-svg-wrap { text-align: center; }
+.zl-svg { width: 100%; max-width: 420px; height: auto; }
+.zl-pt { cursor: pointer; }
+.zl-pt .zl-dot { transition: r 0.15s; }
+.zl-pt:hover .zl-dot { fill: rgba(160,32,32,0.2); }
+.zl-result { margin-top: 14px; padding: 12px; background: rgba(160,32,32,0.06); border-left: 3px solid var(--zhu); font-size: 13px; color: var(--ink-light); min-height: 50px; }
+.zl-r-name { font-size: 16px; font-weight: 700; color: var(--zhu); margin-bottom: 4px; }
+.zl-r-loc { color: var(--ink); font-size: 13px; }
+.zl-r-abs { color: var(--ink-light); font-size: 11px; margin-top: 4px; }
+.zl-note { font-size: 10px; color: var(--ink-light); margin-top: 10px; font-style: italic; line-height: 1.7; }
+
 @media (max-width: 600px) {
   .loc-grid { grid-template-columns: repeat(3, 1fr); }
   .loc-layout { flex-direction: column; align-items: center; }
+  .drill-grid { grid-template-columns: repeat(4, 1fr); }
+  .drill-grid-sm { grid-template-columns: repeat(6, 1fr); }
 }
