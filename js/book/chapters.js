@@ -1,11 +1,15 @@
 // 章节元数据。draft=true 的章节在目录中灰显（后续迭代内容）。
+// 顺序按逻辑：数理→卦图→配法→理论核心→年表推演→声律→以史推步→附录
 export const CHAPTERS = [
-  { id: 'intro', title: '導言：皇極經世是什麼', draft: false },
-  { id: 'ch1',   title: '第一章：元會運世的數理結構', draft: false },
-  { id: 'ch2',   title: '第二章：先天六十四卦圖', draft: false },
-  { id: 'ch3',   title: '第三章：卦氣配法', draft: false },
-  { id: 'ch4',   title: '第四章：以史推步', draft: false },
-  { id: 'appendix', title: '附錄：原典索引·注疏·文獻', draft: false },
+  { id: 'intro',   title: '導言：皇極經世是什麼', draft: false },
+  { id: 'ch1',     title: '第一章：元會運世的數理結構', draft: false },
+  { id: 'ch2',     title: '第二章：先天六十四卦圖', draft: false },
+  { id: 'ch3',     title: '第三章：卦氣配法', draft: false },
+  { id: 'chguan',  title: '第四章：觀物內篇（理論核心）', draft: false },
+  { id: 'chnian',  title: '第五章：以運經世——年表推演', draft: false },
+  { id: 'chsheng', title: '第六章：聲音律品（聲音唱和圖）', draft: false },
+  { id: 'ch4',     title: '第七章：以史推步（歷史哲學）', draft: false },
+  { id: 'appendix',title: '附錄：原典索引·注疏·文獻', draft: false },
 ];
 
 const byId = new Map(CHAPTERS.map(c => [c.id, c]));

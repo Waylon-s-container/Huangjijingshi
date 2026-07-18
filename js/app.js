@@ -122,6 +122,9 @@ start({
   '/book/ch1': () => showBook('ch1'),
   '/book/ch2': () => showBook('ch2'),
   '/book/ch3': () => showBook('ch3'),
+  '/book/chguan': () => showBook('chguan'),
+  '/book/chnian': () => showBook('chnian'),
+  '/book/chsheng': () => showBook('chsheng'),
   '/book/ch4': () => showBook('ch4'),
   '/book/appendix': () => showBook('appendix'),
   '*': () => showBook('intro'), // 兜底：后续章节等回导言（draft 章节会显示"待续"）
