@@ -122,6 +122,7 @@ start({
   '/book/ch1': () => showBook('ch1'),
   '/book/ch2': () => showBook('ch2'),
   '/book/ch3': () => showBook('ch3'),
+  '/book/chshu': () => showBook('chshu'),
   '/book/chguan': () => showBook('chguan'),
   '/book/chnian': () => showBook('chnian'),
   '/book/chsheng': () => showBook('chsheng'),

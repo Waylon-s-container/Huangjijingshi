@@ -3,6 +3,7 @@ import intro from './intro.js';
 import ch1 from './ch1.js';
 import ch2 from './ch2.js';
 import ch3 from './ch3.js';
+import chshu from './chshu.js';
 import chguan from './chguan.js';
 import chnian from './chnian.js';
 import chsheng from './chsheng.js';
@@ -14,7 +15,7 @@ import { renderFangyuanTu } from './diagrams/fangyuanTu.js';
 import { renderXiaoXi } from './diagrams/xiaoXi.js';
 import { renderTimeLocator } from './diagrams/timeLocator.js';
 
-const CHAPTER_DATA = { intro, ch1, ch2, ch3, chguan, chnian, chsheng, ch4, appendix };
+const CHAPTER_DATA = { intro, ch1, ch2, ch3, chshu, chguan, chnian, chsheng, ch4, appendix };
 const DIAGRAMS = {
   eraNesting: renderEraNesting,
   fangyuanTu: renderFangyuanTu,
