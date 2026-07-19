@@ -4,3 +4,4 @@
 # AI 工具个人配置（不进仓库）
 CLAUDE.md
 .claude/
+node_modules/
