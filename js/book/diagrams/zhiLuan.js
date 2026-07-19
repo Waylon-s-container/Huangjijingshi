@@ -23,13 +23,29 @@ export function renderZhiLuan(container) {
   const MIN_Y = -2100, MAX_Y = 2100;
   const cx = 180, cy = 150, R = 110;
 
-  const arcPoints = DYNASTIES.map(d => {
+  // 先算每个朝代点的角度，再检测相邻过近的，错开标签 y 偏移避免重叠
+  const rawAngles = DYNASTIES.map(d => {
     const pct = (d.year - MIN_Y) / (MAX_Y - MIN_Y);
-    const angle = Math.PI - pct * Math.PI; // π(左)→0(右)
+    return Math.PI - pct * Math.PI; // π(左)→0(右)
+  });
+
+  // 标签 y 偏移：若与前一点角度差过小（标签会重叠），则把当前标签向外推（y 更小）
+  const labelOffsets = rawAngles.map((a, i) => {
+    if (i === 0) return 0;
+    const prevA = rawAngles[i - 1];
+    const dAngle = Math.abs(a - prevA);
+    // 弧长 = R * dAngle；标签宽度约 12px，换算成角度约 0.11 弧度
+    if (dAngle < 0.11) return -14; // 与上一个重叠，向外（y 减小）推 14px
+    return 0;
+  });
+
+  const arcPoints = DYNASTIES.map((d, i) => {
+    const a = rawAngles[i];
     return {
       ...d,
-      x: cx + Math.cos(angle) * R,
-      y: cy - Math.sin(angle) * R,
+      x: cx + Math.cos(a) * R,
+      y: cy - Math.sin(a) * R,
+      labelY: cy - Math.sin(a) * R - 12 + labelOffsets[i],
     };
   });
 
@@ -46,7 +62,7 @@ export function renderZhiLuan(container) {
           ${arcPoints.map(p => `
             <g class="zl-pt" data-year="${p.year}" data-name="${p.name}">
               <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6" fill="#f4ecd8" stroke="#a02020" stroke-width="1.5" class="zl-dot"/>
-              <text x="${p.x.toFixed(1)}" y="${(p.y - 12).toFixed(1)}" font-size="10" fill="#2a2418" text-anchor="middle" font-weight="700">${p.name}</text>
+              <text x="${p.x.toFixed(1)}" y="${p.labelY.toFixed(1)}" font-size="10" fill="#2a2418" text-anchor="middle" font-weight="700">${p.name}</text>
             </g>`).join('')}
           <!-- 标注 -->
           <text x="${cx - R - 8}" y="${cy + 5}" font-size="9" fill="#a02020" text-anchor="end">陽息（始）</text>
