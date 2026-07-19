@@ -91,6 +91,24 @@
 
 ---
 
+## 示例图片
+
+<table>
+  <tr>
+    <td width="50%" align="center"><img src="./示例/微信图片_20260719211410_190_83.png" alt="阴阳消息消长图"/><br/><sub>§2.4 阴阳消息消长图（十二消息卦）</sub></td>
+    <td width="50%" align="center"><img src="./示例/微信图片_20260719211435_191_83.png" alt="先天六十四卦方圆图"/><br/><sub>§2.1 先天六十四卦方圆图</sub></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><img src="./示例/微信图片_20260719215157_194_83.png" alt="教材章节示例"/><br/><sub>教材章节示例</sub></td>
+    <td width="50%" align="center"><img src="./示例/微信图片_20260719215244_195_83.png" alt="方圆图细节"/><br/><sub>方圆图（外圆象天、内方象地）</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="./示例/微信图片_20260719215320_196_83.png" alt="六十甲子卦表"/><br/><sub>§3.4 六十甲子卦表（2026 丙午年 = 同人卦，朱砂标记）</sub></td>
+  </tr>
+</table>
+
+---
+
 ## 视觉风格
 
 古籍水墨风，全站统一：
