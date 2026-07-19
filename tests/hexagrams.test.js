@@ -25,7 +25,18 @@ test('四正卦标记正确', () => {
 });
 
 test('getById / getByName 查找', () => {
-  assert.equal(getById(1).name, '复');
-  // 同人按先天圆图序为去四正后第15卦（id=15）；值年锚点由 calendar.js 按名查找
-  assert.equal(getByName('同人').id, 15);
+  // 按严格二进制序：坤=1(000000)、乾=64(111111)
+  assert.equal(getById(1).name, '坤');
+  assert.equal(getById(64).name, '乾');
+  // 同人(101111)二进制值=61，id=62
+  assert.equal(getByName('同人').id, 62);
+});
+
+test('圆图序严格遵循二进制（加一倍法）', () => {
+  // 邵雍"加一倍法"=严格二进制：lines[0]=初爻=最低位
+  // id 应等于 lines 的二进制值 + 1（坤000000=0→id1, 乾111111=63→id64）
+  for (const h of HEXAGRAMS) {
+    const binVal = parseInt(h.lines.split('').reverse().join(''), 2);
+    assert.equal(h.id, binVal + 1, `${h.name} 的 id 应为 ${binVal + 1}，实际 ${h.id}`);
+  }
 });

@@ -69,8 +69,8 @@ test('60年周期：2086与1966同为同人', () => {
 });
 
 test('相邻年份值年卦为同人前后卦（锁定先天圆图序）', () => {
-  // 同人按先天圆图序(去四正)为第15卦：前(第14)=革，后(第16)=临。
-  // 此用例锁定 HEXAGRAMS 圆图序正确，防止同人/丰/革错位回归。
-  assert.equal(valueYearHexagram(2025).name, '革');
-  assert.equal(valueYearHexagram(2027).name, '临');
+  // 同人(101111)按严格二进制序：前=遁(001111)，后=姤(011111)。
+  // 此用例锁定 HEXAGRAMS 圆图序为严格的"加一倍法"二进制序。
+  assert.equal(valueYearHexagram(2025).name, '遁');
+  assert.equal(valueYearHexagram(2027).name, '姤');
 });
