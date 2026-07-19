@@ -576,9 +576,34 @@
 .zl-r-abs { color: var(--ink-light); font-size: 11px; margin-top: 4px; }
 .zl-note { font-size: 10px; color: var(--ink-light); margin-top: 10px; font-style: italic; line-height: 1.7; }
 
+/* 图解: 六十甲子卦表 */
+.jht-box {
+  background: rgba(235,224,200,0.4);
+  border: 1px solid var(--line);
+  padding: 18px;
+  margin: 16px 0;
+}
+.jht-explain { font-size: 12px; color: var(--ink-light); margin-bottom: 12px; line-height: 1.7; }
+.jht-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.jht-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.jht-table th {
+  font-weight: 400; color: var(--ink-light); letter-spacing: 2px;
+  font-size: 10px; padding: 6px 4px; border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.jht-table td { padding: 4px 4px; border-bottom: 1px dashed rgba(138,122,90,0.25); vertical-align: middle; }
+.jht-jiazi { color: var(--ink); font-weight: 700; letter-spacing: 1px; width: 18%; }
+.jht-mini { width: 20px; }
+.jht-name { color: var(--ink); letter-spacing: 1px; }
+.jht-year { color: var(--ink-light); font-size: 10px; text-align: right; }
+.jht-cur { background: rgba(160,32,32,0.12); }
+.jht-cur .jht-jiazi, .jht-cur .jht-name { color: var(--zhu); }
+.jht-note { font-size: 10px; color: var(--ink-light); margin-top: 12px; font-style: italic; line-height: 1.7; }
+
 @media (max-width: 600px) {
   .loc-grid { grid-template-columns: repeat(3, 1fr); }
   .loc-layout { flex-direction: column; align-items: center; }
   .drill-grid { grid-template-columns: repeat(4, 1fr); }
   .drill-grid-sm { grid-template-columns: repeat(6, 1fr); }
+  .jht-grid { grid-template-columns: 1fr; }
 }

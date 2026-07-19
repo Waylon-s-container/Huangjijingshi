@@ -18,6 +18,7 @@ import { renderSanCai } from './diagrams/sanCai.js';
 import { renderHistoryTimeline } from './diagrams/historyTimeline.js';
 import { renderShengHe } from './diagrams/shengHe.js';
 import { renderZhiLuan } from './diagrams/zhiLuan.js';
+import { renderJiaziHexTable } from './diagrams/jiaziHexTable.js';
 
 const CHAPTER_DATA = { intro, ch1, ch2, ch3, chshu, chguan, chnian, chsheng, ch4, appendix };
 const DIAGRAMS = {
@@ -29,6 +30,7 @@ const DIAGRAMS = {
   historyTimeline: renderHistoryTimeline,
   shengHe: renderShengHe,
   zhiLuan: renderZhiLuan,
+  jiaziHexTable: renderJiaziHexTable,
 };
 
 // 渲染教材某章节到 container
