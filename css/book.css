@@ -86,6 +86,44 @@
 .back-cover { color: var(--ink); text-decoration: none; letter-spacing: 2px; }
 .chapter-progress { letter-spacing: 2px; }
 
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+/* 字号控件：两个按钮紧挨，朱砂强调当前激活方向 */
+.font-size-ctrl {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.font-btn {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  letter-spacing: 0;
+  line-height: 1.4;
+  transition: color 0.15s, background 0.15s;
+}
+.font-btn + .font-btn {
+  border-left: 1px solid var(--line);
+}
+.font-btn:hover:not(:disabled) {
+  color: var(--zhu);
+  background: rgba(160,32,32,0.06);
+}
+.font-btn:disabled {
+  color: var(--ink-light);
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* 目录抽屉 + 遮罩 */
 .toc-drawer {
   position: fixed;
@@ -147,11 +185,80 @@
 .toc-item.active { color: var(--zhu); border-left-color: var(--zhu); font-weight: 700; }
 .toc-item.draft { color: var(--ink-light); opacity: 0.5; pointer-events: none; }
 
+/* 双栏布局：正文 + 右侧辅助面板。窄屏自动堆叠。 */
+.book-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  align-items: start;
+}
 .book-content {
-  padding: 40px 48px 60px;
-  max-width: 720px;
+  padding: 40px 0 60px;
+  min-width: 0;  /* 防止 grid 子项溢出 */
+  max-width: 760px;
   line-height: 1.9;
   overflow: hidden;
+  /* 字号由 JS 设置 --book-fs 驱动，未设置时回退 15px */
+  font-size: var(--book-fs, 15px);
+}
+/* 右侧辅助面板：sticky 跟随滚动 */
+.book-aside {
+  position: sticky;
+  top: 72px;  /* topbar 高 ~48 + 24 间距 */
+  padding: 40px 0 20px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  font-size: 12px;
+}
+.aside-block { padding-left: 16px; border-left: 1px solid rgba(138,122,90,0.35); }
+.aside-title {
+  font-size: 11px;
+  color: var(--ink-light);
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+.aside-hint {
+  font-size: 12px;
+  color: var(--ink-light);
+  line-height: 1.7;
+  opacity: 0.85;
+}
+.aside-list { display: flex; flex-direction: column; gap: 2px; }
+.aside-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 8px;
+  text-decoration: none;
+  color: var(--ink);
+  line-height: 1.5;
+  border-left: 2px solid transparent;
+  margin-left: -10px;
+  padding-left: 8px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.aside-item:hover { color: var(--zhu); background: rgba(160,32,32,0.04); }
+.aside-item.active {
+  color: var(--zhu);
+  border-left-color: var(--zhu);
+  font-weight: 700;
+}
+.aside-num {
+  color: var(--ink-light);
+  font-size: 11px;
+  flex-shrink: 0;
+  min-width: 28px;
+}
+.aside-item.active .aside-num { color: var(--zhu); }
+.aside-text { flex: 1; min-width: 0; }
+
+/* 窄屏：辅助面板隐藏，正文铺满 */
+@media (max-width: 1100px) {
+  .book-body { grid-template-columns: 1fr; }
+  .book-aside { display: none; }
+  .book-content { max-width: 760px; margin: 0 auto; }
 }
 /* 章节正文淡入：每次重新渲染（章节切换/语言切换）触发 */
 .book-content-inner {
@@ -162,7 +269,7 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 .chapter-title {
-  font-size: 26px;
+  font-size: 1.733em;  /* 26/15 */
   font-weight: 700;
   letter-spacing: 4px;
   margin-bottom: 32px;
@@ -171,7 +278,7 @@
 }
 .book-section { margin-bottom: 48px; }
 .section-title {
-  font-size: 18px;
+  font-size: 1.2em;  /* 18/15 */
   font-weight: 700;
   letter-spacing: 2px;
   margin-bottom: 16px;
@@ -179,11 +286,11 @@
 }
 
 /* 五段式各段 */
-.seg { margin-bottom: 18px; font-size: 15px; }
+.seg { margin-bottom: 18px; font-size: 1em; }
 .seg.intro { color: var(--ink); }
 .seg-label {
   display: inline-block;
-  font-size: 11px;
+  font-size: 0.733em;  /* 11/15 */
   color: var(--zhu);
   letter-spacing: 3px;
   margin-right: 8px;
@@ -195,21 +302,21 @@
   padding: 14px 18px;
 }
 .source-quote {
-  font-size: 15px;
+  font-size: 1em;
   line-height: 1.9;
   color: var(--ink);
   margin: 0 0 8px 0;
 }
-.source-cite { font-size: 12px; color: var(--ink-light); }
+.source-cite { font-size: 0.8em; color: var(--ink-light); }
 .seg.commentaries { padding-left: 12px; }
 .comm-item {
-  font-size: 13px;
+  font-size: 0.867em;  /* 13/15 */
   line-height: 1.8;
   color: var(--ink);
   margin-bottom: 8px;
 }
 .comm-author { color: var(--zhu); font-weight: 700; }
-.comm-work { color: var(--ink-light); font-size: 12px; }
+.comm-work { color: var(--ink-light); font-size: 0.8em; }
 .seg.diagram {
   text-align: center;
   margin: 28px 0;

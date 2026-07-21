@@ -4,6 +4,28 @@
 import { CHAPTERS, getNext, getPrev } from './chapters.js';
 import { t, getLang } from '../i18n.js';
 
+// ===== 阅读字号管理 =====
+// 3 档：小 14 / 中 15（默认） / 大 17
+const FONT_SIZES = [14, 15, 17];
+const FONT_KEY = 'hjjss-font-size';
+let fontIndex = loadFontIndex();
+
+function loadFontIndex() {
+  if (typeof localStorage === 'undefined') return 1;
+  const stored = parseInt(localStorage.getItem(FONT_KEY), 10);
+  return Number.isFinite(stored) && stored >= 0 && stored < FONT_SIZES.length ? stored : 1;
+}
+function applyFontSize(container) {
+  const content = container.querySelector('.book-content');
+  if (content) content.style.setProperty('--book-fs', FONT_SIZES[fontIndex] + 'px');
+  const btns = container.querySelectorAll('.font-btn');
+  btns.forEach(b => b.disabled = false);
+  const dec = container.querySelector('.font-dec');
+  const inc = container.querySelector('.font-inc');
+  if (dec) dec.disabled = fontIndex === 0;
+  if (inc) inc.disabled = fontIndex === FONT_SIZES.length - 1;
+}
+
 // 渲染整个教材视图到 container。chapter=当前章节内容对象
 export function renderBook(container, chapter) {
   container.innerHTML = `
@@ -15,15 +37,42 @@ export function renderBook(container, chapter) {
             <a class="back-cover" href="#/">⟵ ${t('返回封面')}</a>
           </div>
           <span class="chapter-progress">${t(chapter.title)}</span>
-          <button class="lang-toggle" data-lang-toggle title="${t('切換簡繁')}">${getLang() === 'hant' ? '簡' : '繁'}</button>
+          <div class="topbar-right">
+            <div class="font-size-ctrl" role="group" aria-label="${t('字號')}">
+              <button class="font-btn font-dec" title="${t('縮小字號')}" aria-label="${t('縮小字號')}">A⁻</button>
+              <button class="font-btn font-inc" title="${t('放大字號')}" aria-label="${t('放大字號')}">A⁺</button>
+            </div>
+            <button class="lang-toggle" data-lang-toggle title="${t('切換簡繁')}">${getLang() === 'hant' ? '簡' : '繁'}</button>
+          </div>
         </header>
-        <article class="book-content"><div class="book-content-inner">${renderChapter(chapter)}</div></article>
+        <div class="book-body">
+          <article class="book-content"><div class="book-content-inner">${renderChapter(chapter)}</div></article>
+          <aside class="book-aside" id="book-aside">${renderAside(chapter)}</aside>
+        </div>
         <nav class="chapter-nav">${renderChapterNav(chapter.id)}</nav>
       </main>
       <div class="toc-drawer" id="toc-drawer" hidden>${renderToc(chapter.id)}</div>
       <div class="toc-overlay" id="toc-overlay" hidden></div>
     </div>`;
   bindTocDrawer(container);
+  bindFontButtons(container);
+  applyFontSize(container);
+  bindScrollSpy(container);
+}
+
+function bindFontButtons(container) {
+  const dec = container.querySelector('.font-dec');
+  const inc = container.querySelector('.font-inc');
+  if (dec) dec.addEventListener('click', () => {
+    if (fontIndex > 0) { fontIndex--; saveAndApply(container); }
+  });
+  if (inc) inc.addEventListener('click', () => {
+    if (fontIndex < FONT_SIZES.length - 1) { fontIndex++; saveAndApply(container); }
+  });
+}
+function saveAndApply(container) {
+  try { localStorage.setItem(FONT_KEY, String(fontIndex)); } catch (e) { /* ignore */ }
+  applyFontSize(container);
 }
 
 // 目录
@@ -78,6 +127,74 @@ function bindTocDrawer(container) {
       btn.focus();
     }
   });
+}
+
+// 右侧辅助面板：本章节子目录（点击跳转 + scrollspy）
+function renderAside(chapter) {
+  // 附录无 sections，显示原典索引快链（跳到附录）
+  if (chapter.layout === 'appendix' || !chapter.sections?.length) {
+    return `
+      <div class="aside-block">
+        <div class="aside-title">${t('本章無小節')}</div>
+        <div class="aside-hint">${t('附錄為索引結構，可點目錄中各章查閱。')}</div>
+      </div>`;
+  }
+  const items = chapter.sections.map(s =>
+    `<a class="aside-item" href="#sec-${s.id}" data-sec-id="${s.id}"><span class="aside-num">${s.id}</span><span class="aside-text">${t(s.title)}</span></a>`
+  ).join('');
+  return `
+    <div class="aside-block">
+      <div class="aside-title">${t('本文章節')}</div>
+      <nav class="aside-list">${items}</nav>
+    </div>`;
+}
+
+// scrollspy：滚动时高亮右侧当前可见小节
+function bindScrollSpy(container) {
+  const aside = container.querySelector('#book-aside');
+  if (!aside) return;
+  const items = Array.from(aside.querySelectorAll('.aside-item'));
+  if (!items.length) return;
+
+  // 平滑滚动到锚点
+  aside.addEventListener('click', (e) => {
+    const link = e.target.closest('.aside-item');
+    if (!link) return;
+    e.preventDefault();
+    // href="#sec-0.2"，但 section id 含 '.'，querySelector 不合法，必须用 getElementById
+    const id = link.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (target) {
+      // sticky topbar 高 ~48px，预留 16px 视觉缓冲
+      const top = target.getBoundingClientRect().top + window.scrollY - 64;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  });
+
+  // IntersectionObserver 监听各 section 进入视口
+  const sections = items
+    .map(it => {
+      const id = it.getAttribute('href').slice(1);
+      return document.getElementById(id);
+    })
+    .filter(Boolean);
+  if (!sections.length) return;
+
+  const visible = new Set();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) visible.add(en.target.id);
+      else visible.delete(en.target.id);
+    });
+    // 取可见中第一个按 DOM 顺序的 section 高亮
+    const firstVisible = sections.find(s => visible.has(s.id));
+    items.forEach(it => {
+      const isActive = firstVisible && it.getAttribute('href') === '#' + firstVisible.id;
+      it.classList.toggle('active', isActive);
+    });
+  }, { rootMargin: '-64px 0px -70% 0px', threshold: [0, 0.1, 0.5] });
+
+  sections.forEach(s => observer.observe(s));
 }
 
 // 章节正文：标题 + 各小节（五段式）；附录用专门的 blocks 渲染
