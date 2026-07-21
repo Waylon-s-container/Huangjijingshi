@@ -34,15 +34,98 @@
 
 /* 教材整体布局 */
 .book-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
   min-height: calc(100vh - 60px);
+  position: relative;
 }
-.book-toc {
-  background: rgba(235,224,200,0.4);
+.book-main { display: flex; flex-direction: column; }
+
+.book-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-light);
+  position: sticky;
+  top: 0;
+  background: rgba(244,236,216,0.92);
+  backdrop-filter: blur(6px);
+  z-index: 5;
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+/* 「目」按钮 */
+.toc-toggle {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  width: 34px;
+  height: 30px;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 1px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.toc-toggle:hover {
+  color: var(--zhu);
+  border-color: var(--zhu);
+  background: rgba(160,32,32,0.05);
+}
+.toc-toggle[aria-expanded="true"] {
+  color: var(--zhu);
+  border-color: var(--zhu);
+  background: rgba(160,32,32,0.08);
+}
+.back-cover { color: var(--ink); text-decoration: none; letter-spacing: 2px; }
+.chapter-progress { letter-spacing: 2px; }
+
+/* 目录抽屉 + 遮罩 */
+.toc-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  max-width: 84vw;
+  height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(244,236,216,0.98) 0%, rgba(235,224,200,0.96) 100%);
   border-right: 1px solid var(--line);
-  padding: 24px 16px;
+  padding: 24px 20px;
+  box-shadow: 4px 0 24px rgba(90,74,50,0.12);
+  transform: translateX(-100%);
+  transition: transform 0.26s ease-out;
+  z-index: 30;
+  overflow-y: auto;
 }
+.toc-drawer.open {
+  transform: translateX(0);
+}
+.toc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(42,36,24,0.18);
+  opacity: 0;
+  transition: opacity 0.26s ease-out;
+  z-index: 25;
+  cursor: pointer;
+}
+.toc-overlay.show {
+  opacity: 1;
+}
+/* drawer 第一次显示时同步把 overlay 标记为 show */
+.toc-drawer.open + .toc-overlay,
+.toc-drawer.open ~ .toc-overlay {
+  display: block;
+}
+.toc-drawer:not(.open) ~ .toc-overlay { display: none; }
+
 .toc-title {
   font-size: 13px;
   color: var(--ink-light);
@@ -64,23 +147,19 @@
 .toc-item.active { color: var(--zhu); border-left-color: var(--zhu); font-weight: 700; }
 .toc-item.draft { color: var(--ink-light); opacity: 0.5; pointer-events: none; }
 
-.book-main { display: flex; flex-direction: column; }
-.book-topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 32px;
-  border-bottom: 1px solid var(--line);
-  font-size: 12px;
-  color: var(--ink-light);
-}
-.back-cover { color: var(--ink); text-decoration: none; letter-spacing: 2px; }
-.chapter-progress { letter-spacing: 2px; }
-
 .book-content {
   padding: 40px 48px 60px;
   max-width: 720px;
   line-height: 1.9;
+  overflow: hidden;
+}
+/* 章节正文淡入：每次重新渲染（章节切换/语言切换）触发 */
+.book-content-inner {
+  animation: book-fade-in 0.4s ease-out;
+}
+@keyframes book-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .chapter-title {
   font-size: 26px;

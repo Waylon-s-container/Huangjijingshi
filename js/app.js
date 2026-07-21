@@ -111,18 +111,31 @@ const bookView = document.getElementById('book-view');
 let currentView = 'cover';   // 'cover' | 'book'
 let currentChapter = null;
 
+// 用 View Transitions API 包裹视图切换（支持时跨视图淡入；不支持时降级为直接切换）
+function withViewTransition(transitionFn) {
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(transitionFn);
+  } else {
+    transitionFn();
+  }
+}
+
 function showCover() {
-  currentView = 'cover';
-  coverView.hidden = false;
-  bookView.hidden = true;
+  withViewTransition(() => {
+    currentView = 'cover';
+    coverView.hidden = false;
+    bookView.hidden = true;
+  });
 }
 function showBook(chapterId) {
-  currentView = 'book';
-  currentChapter = chapterId;
-  coverView.hidden = true;
-  bookView.hidden = false;
-  renderChapterView(bookView, chapterId);
-  window.scrollTo(0, 0);
+  withViewTransition(() => {
+    currentView = 'book';
+    currentChapter = chapterId;
+    coverView.hidden = true;
+    bookView.hidden = false;
+    renderChapterView(bookView, chapterId);
+    window.scrollTo(0, 0);
+  });
 }
 
 // ===== 简繁切换 =====

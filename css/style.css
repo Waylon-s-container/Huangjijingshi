@@ -8,6 +8,32 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
+/* 修复：HTML hidden 属性会被显式 display 规则覆盖，必须显式声明 hidden 时强制 none */
+[hidden] { display: none !important; }
+
+/* View Transitions：封面 ↔ 教材跨视图淡入（水墨晕开质感） */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.35s;
+    animation-timing-function: ease-out;
+    mix-blend-mode: normal;
+  }
+  ::view-transition-old(root) {
+    animation-name: vt-fade-out;
+  }
+  ::view-transition-new(root) {
+    animation-name: vt-fade-in;
+  }
+  @keyframes vt-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+  @keyframes vt-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
 body {
   background: var(--paper);
   color: var(--ink);

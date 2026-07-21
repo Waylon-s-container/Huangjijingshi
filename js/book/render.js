@@ -8,17 +8,22 @@ import { t, getLang } from '../i18n.js';
 export function renderBook(container, chapter) {
   container.innerHTML = `
     <div class="book-layout">
-      <aside class="book-toc">${renderToc(chapter.id)}</aside>
       <main class="book-main">
         <header class="book-topbar">
-          <a class="back-cover" href="#/">⟵ ${t('返回封面')}</a>
+          <div class="topbar-left">
+            <button class="toc-toggle" id="toc-toggle" title="${t('目錄')}" aria-label="${t('目錄')}" aria-expanded="false" aria-controls="toc-drawer">${t('目')}</button>
+            <a class="back-cover" href="#/">⟵ ${t('返回封面')}</a>
+          </div>
           <span class="chapter-progress">${t(chapter.title)}</span>
           <button class="lang-toggle" data-lang-toggle title="${t('切換簡繁')}">${getLang() === 'hant' ? '簡' : '繁'}</button>
         </header>
-        <article class="book-content">${renderChapter(chapter)}</article>
+        <article class="book-content"><div class="book-content-inner">${renderChapter(chapter)}</div></article>
         <nav class="chapter-nav">${renderChapterNav(chapter.id)}</nav>
       </main>
+      <div class="toc-drawer" id="toc-drawer" hidden>${renderToc(chapter.id)}</div>
+      <div class="toc-overlay" id="toc-overlay" hidden></div>
     </div>`;
+  bindTocDrawer(container);
 }
 
 // 目录
@@ -29,6 +34,50 @@ function renderToc(currentId) {
     return `<a class="${cls}${draftCls}" href="#/book/${c.id}"${c.draft ? ' aria-disabled="true"' : ''}>${t(c.title)}</a>`;
   }).join('');
   return `<div class="toc-title">${t('目錄')}</div>${items}`;
+}
+
+// 绑定抽屉的开关逻辑（一次性绑定，避免章节切换时重复）
+function bindTocDrawer(container) {
+  const btn = container.querySelector('#toc-toggle');
+  const drawer = container.querySelector('#toc-drawer');
+  const overlay = container.querySelector('#toc-overlay');
+  if (!btn || !drawer || !overlay) return;
+
+  const open = () => {
+    drawer.hidden = false;
+    overlay.hidden = false;
+    // 强制 reflow 后再加 class，触发 transition
+    void drawer.offsetWidth;
+    drawer.classList.add('open');
+    overlay.classList.add('show');
+    btn.setAttribute('aria-expanded', 'true');
+    setTimeout(() => drawer.querySelector('.toc-item.active')?.focus(), 60);
+  };
+  const close = () => {
+    drawer.classList.remove('open');
+    overlay.classList.remove('show');
+    btn.setAttribute('aria-expanded', 'false');
+    // 等动画结束再隐藏
+    setTimeout(() => {
+      if (!drawer.classList.contains('open')) drawer.hidden = true;
+      if (!overlay.classList.contains('show')) overlay.hidden = true;
+    }, 260);
+  };
+  const toggle = () => drawer.classList.contains('open') ? close() : open();
+
+  btn.addEventListener('click', toggle);
+  overlay.addEventListener('click', close);
+  // 点击目录项后自动收起
+  drawer.addEventListener('click', (e) => {
+    if (e.target.matches('.toc-item:not(.draft)')) close();
+  });
+  // Esc 关闭
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('open')) {
+      close();
+      btn.focus();
+    }
+  });
 }
 
 // 章节正文：标题 + 各小节（五段式）；附录用专门的 blocks 渲染
